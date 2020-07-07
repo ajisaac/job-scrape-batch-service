@@ -1,9 +1,13 @@
-package com.ajisaac.scrapebatch.indeed;
+package com.ajisaac.scrapebatch.sites.indeed;
 
+import com.ajisaac.scrapebatch.dto.ScrapeJob;
+import com.ajisaac.scrapebatch.webservice.Message;
 import com.google.common.base.Strings;
 
-/** Use these statuses for informing the user that the job is invalid. */
-public enum IndeedSearchValidationStatus {
+/**
+ * Allows us to validate that the submitted ScrapeJob is valid for Indeed.com
+ */
+public enum IndeedSearchValidationStatus implements Message {
   NAME_IS_REQUIRED("name for job is required"),
   QUERY_IS_REQUIRED("query is required"),
   LOCATION_IS_REQUIRED("location is required"),
@@ -17,7 +21,8 @@ public enum IndeedSearchValidationStatus {
     this.errorMessage = errorMessage;
   }
 
-  public String getErrorMessage() {
+  @Override
+  public String getMessage() {
     return errorMessage;
   }
 
@@ -27,7 +32,7 @@ public enum IndeedSearchValidationStatus {
    * @param job The job to validate.
    * @return The status of the job's validity.
    */
-  public static IndeedSearchValidationStatus ValidateJob(IndeedSearch job) {
+  public static IndeedSearchValidationStatus ValidateJob(ScrapeJob job) {
     if (Strings.nullToEmpty(job.getName()).isBlank()) {
       return NAME_IS_REQUIRED;
     }
@@ -59,21 +64,13 @@ public enum IndeedSearchValidationStatus {
 
   /** There's a predefined set of possible sort types. */
   private static boolean isSortTypeValid(String sortType) {
-    for (SortType st : SortType.values()) {
-      if (sortType.equals(st.toString())) {
-        return true;
-      }
-    }
-    return false;
+    // todo we should validate this
+    return true;
   }
 
   /** There's a predefined set of possible job types. */
   private static boolean isJobTypeValid(String jobType) {
-    for (JobType jt : JobType.values()) {
-      if (jobType.equals(jt.toString())) {
-        return true;
-      }
-    }
-    return false;
+    // todo add the job types
+    return true;
   }
 }

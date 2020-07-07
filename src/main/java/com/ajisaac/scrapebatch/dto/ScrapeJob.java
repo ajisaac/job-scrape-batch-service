@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch.indeed;
+package com.ajisaac.scrapebatch.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -9,13 +9,14 @@ import javax.persistence.Id;
 
 /** One of these holds all the data needed to handle a single scraping. */
 @Entity
-public class IndeedSearch {
+public class ScrapeJob{
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @JsonIgnoreProperties(ignoreUnknown = true)
   private long id;
 
+  private String site;
   private String name;
   private String query;
   private String location;
@@ -86,5 +87,13 @@ public class IndeedSearch {
 
   public void setSortType(String sortType) {
     this.sortType = sortType;
+  }
+
+  public String getSite() {
+    return this.site;
+  }
+
+  public void setSite(String site) {
+    this.site = site;
   }
 }
