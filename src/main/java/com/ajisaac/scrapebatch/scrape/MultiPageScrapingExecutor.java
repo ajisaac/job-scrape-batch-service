@@ -19,12 +19,20 @@ public abstract class MultiPageScrapingExecutor extends ScrapingExecutor {
   public void scrape() {
 
     while (hasMorePages) {
-
+      pause(pauseTime);
       // get the page to scrape
       URI uri = getNextMainPageURI();
+      if(uri == null){
+        // todo handle this
+        break;
+      }
 
       // make the request for that url
       String mainPage = grabPage(uri);
+      if(mainPage == null){
+        // todo handle this
+        break;
+      }
 
       List<JobPosting> jobPostings = parseMainPage(mainPage);
 
@@ -40,8 +48,10 @@ public abstract class MultiPageScrapingExecutor extends ScrapingExecutor {
           e.printStackTrace();
           // we simply won't store this job posting with any of it's details.
         }
-        jobPosting = setJobSite(jobPosting);
-        super.storeInDatabase(jobPosting);
+        if (jobPosting != null) {
+          jobPosting = setJobSite(jobPosting);
+          super.storeInDatabase(jobPosting);
+        }
       }
     }
   }

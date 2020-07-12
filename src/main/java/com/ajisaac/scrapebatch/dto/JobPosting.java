@@ -1,5 +1,6 @@
 package com.ajisaac.scrapebatch.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Type;
 
@@ -35,6 +36,17 @@ public final class JobPosting {
   @Column(columnDefinition = "TEXT")
   private String miscText;
   private String status;
+
+  @JsonIgnore
+  private boolean ignoreScrapeDescriptionPage;
+
+  public boolean isIgnoreScrapeDescriptionPage() {
+    return ignoreScrapeDescriptionPage;
+  }
+
+  public void setIgnoreScrapeDescriptionPage(boolean ignoreScrapeDescriptionPage) {
+    this.ignoreScrapeDescriptionPage = ignoreScrapeDescriptionPage;
+  }
 
   public JobPosting() {}
 

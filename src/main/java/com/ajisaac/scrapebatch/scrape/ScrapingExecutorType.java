@@ -2,7 +2,10 @@ package com.ajisaac.scrapebatch.scrape;
 
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.sites.indeed.IndeedScrapingExecutor;
+import com.ajisaac.scrapebatch.sites.remoteco.RemotecoScrapingExecutor;
+import com.ajisaac.scrapebatch.sites.remoteokio.RemoteokioScrapingExecutor;
 import com.ajisaac.scrapebatch.sites.remotiveio.RemotiveioScrapingExecutor;
+import com.ajisaac.scrapebatch.sites.sitepoint.SitepointScrapingExecutor;
 import com.ajisaac.scrapebatch.sites.weworkremotely.WwrScrapingExecutor;
 
 import java.lang.reflect.InvocationTargetException;
@@ -10,11 +13,11 @@ import java.lang.reflect.InvocationTargetException;
 public enum ScrapingExecutorType {
   INDEED(IndeedScrapingExecutor.class),
   WWR(WwrScrapingExecutor.class),
-  REMOTIVEIO(RemotiveioScrapingExecutor.class);
-//  remoteco
-//  remoteok
+  REMOTIVEIO(RemotiveioScrapingExecutor.class),
+  REMOTECO(RemotecoScrapingExecutor.class),
+  REMOTEOKIO(RemoteokioScrapingExecutor.class),
+  SITEPOINT(SitepointScrapingExecutor.class);
 //  workew
-//  sitepoint
 //  stackoverflow
 //  github
 //  ycombinator

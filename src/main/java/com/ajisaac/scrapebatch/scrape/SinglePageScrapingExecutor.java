@@ -1,6 +1,7 @@
 package com.ajisaac.scrapebatch.scrape;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
+import com.google.common.base.Strings;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,7 +18,8 @@ public abstract class SinglePageScrapingExecutor extends ScrapingExecutor {
   public void scrape() {
 
     // get the page to scrape
-    URI uri = getMainPageURI();
+    final String href = getMainPageHref();
+    URI uri = getMainPageURI(href);
     if (uri == null) return;
 
     // make the request for that url
@@ -26,18 +28,21 @@ public abstract class SinglePageScrapingExecutor extends ScrapingExecutor {
     List<JobPosting> jobPostings = parseMainPage(mainPage);
 
     for (JobPosting jobPosting : jobPostings) {
-      pause(pauseTime);
-      try {
-        String jobDescriptionPage = grabPage(jobPosting.getHref());
-        if(jobDescriptionPage == null || jobDescriptionPage.isBlank()){
-          continue;
+      if (!jobPosting.isIgnoreScrapeDescriptionPage()) {
+        pause(pauseTime);
+        try {
+          String jobDescriptionPage = grabPage(jobPosting.getHref());
+          if (jobDescriptionPage == null || jobDescriptionPage.isBlank()) {
+            continue;
+          }
+          jobPosting = parseJobDescriptionPage(jobDescriptionPage, jobPosting);
+        } catch (URISyntaxException e) {
+          // just don't store the descriptions and such if there is an error
+          e.printStackTrace();
         }
-        jobPosting = parseJobDescriptionPage(jobDescriptionPage, jobPosting);
-      } catch (URISyntaxException e) {
-        // just don't store the descriptions and such if there is an error
-        e.printStackTrace();
       }
-      if(jobPosting != null){
+      if (jobPosting != null) {
+        jobPosting = setJobSite(jobPosting);
         super.storeInDatabase(jobPosting);
       }
     }
@@ -49,5 +54,21 @@ public abstract class SinglePageScrapingExecutor extends ScrapingExecutor {
    *
    * @return The next URI to scrape.
    */
-  protected abstract URI getMainPageURI();
+  protected URI getMainPageURI(String href) {
+    if (Strings.nullToEmpty(href).isBlank()) {
+      return null;
+    }
+    try {
+      return new URI(href);
+    } catch (URISyntaxException e) {
+      return null;
+    }
+  }
+
+  /**
+   * For a single page scraper, this would return the href to scrape.
+   *
+   * @return The url of a page to scrape.
+   */
+  protected abstract String getMainPageHref();
 }
