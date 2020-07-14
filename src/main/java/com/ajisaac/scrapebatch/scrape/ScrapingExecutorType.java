@@ -6,7 +6,9 @@ import com.ajisaac.scrapebatch.sites.remoteco.RemotecoScrapingExecutor;
 import com.ajisaac.scrapebatch.sites.remoteokio.RemoteokioScrapingExecutor;
 import com.ajisaac.scrapebatch.sites.remotiveio.RemotiveioScrapingExecutor;
 import com.ajisaac.scrapebatch.sites.sitepoint.SitepointScrapingExecutor;
+import com.ajisaac.scrapebatch.sites.stackoverflow.StackoverflowScrapingExecutor;
 import com.ajisaac.scrapebatch.sites.weworkremotely.WwrScrapingExecutor;
+import com.ajisaac.scrapebatch.sites.workingnomads.WorkingNomadsScrapingExecutor;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -16,13 +18,13 @@ public enum ScrapingExecutorType {
   REMOTIVEIO(RemotiveioScrapingExecutor.class),
   REMOTECO(RemotecoScrapingExecutor.class),
   REMOTEOKIO(RemoteokioScrapingExecutor.class),
-  SITEPOINT(SitepointScrapingExecutor.class);
-//  workew
-//  stackoverflow
-//  github
-//  ycombinator
-//  flexjobs
-//  remotelyawesomejobs
+  SITEPOINT(SitepointScrapingExecutor.class),
+  STACKOVERFLOW(StackoverflowScrapingExecutor.class),
+  WORKINGNOMADS(WorkingNomadsScrapingExecutor.class);
+  //  workew
+  //  github
+  //  ycombinator
+  //  flexjobs
 
   Class<? extends ScrapingExecutor> clazz;
 
@@ -50,6 +52,7 @@ public enum ScrapingExecutorType {
 
   /**
    * Creates a new instance of the ScrapingExecutor of a particular type.
+   *
    * @return
    */
   public ScrapingExecutor getInstance() {

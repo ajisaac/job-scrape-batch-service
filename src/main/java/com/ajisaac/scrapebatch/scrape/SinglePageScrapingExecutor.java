@@ -43,6 +43,7 @@ public abstract class SinglePageScrapingExecutor extends ScrapingExecutor {
       }
       if (jobPosting != null) {
         jobPosting = setJobSite(jobPosting);
+        jobPosting.setStatus("new");
         super.storeInDatabase(jobPosting);
       }
     }

@@ -127,8 +127,6 @@ public class RemotiveioScrapingExecutor extends SinglePageScrapingExecutor {
       }
     }
 
-    jobPosting.setStatus("new");
-
     return jobPosting;
   }
 

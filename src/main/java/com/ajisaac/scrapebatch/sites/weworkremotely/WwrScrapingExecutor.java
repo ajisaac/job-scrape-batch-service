@@ -141,8 +141,6 @@ public class WwrScrapingExecutor extends SinglePageScrapingExecutor {
       jobPosting.setDescription(text);
     }
 
-    jobPosting.setStatus("new");
-
     return jobPosting;
   }
 

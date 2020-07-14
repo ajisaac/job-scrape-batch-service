@@ -36,7 +36,6 @@ public final class IndeedScrapingExecutor extends MultiPageScrapingExecutor {
       String description = text.toString().trim();
       jobPosting.setDescription(description);
     }
-    jobPosting.setStatus("new");
     return jobPosting;
   }
 

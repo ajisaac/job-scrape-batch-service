@@ -130,7 +130,6 @@ public class RemoteokioScrapingExecutor extends SinglePageScrapingExecutor {
       }
     }
 
-    jobPosting.setStatus("new");
     jobPosting.setIgnoreScrapeDescriptionPage(true);
 
     return jobPosting;

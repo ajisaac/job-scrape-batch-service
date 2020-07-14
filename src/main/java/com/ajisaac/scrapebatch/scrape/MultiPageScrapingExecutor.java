@@ -50,6 +50,7 @@ public abstract class MultiPageScrapingExecutor extends ScrapingExecutor {
         }
         if (jobPosting != null) {
           jobPosting = setJobSite(jobPosting);
+          jobPosting.setStatus("new");
           super.storeInDatabase(jobPosting);
         }
       }

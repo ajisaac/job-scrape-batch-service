@@ -78,8 +78,6 @@ public class SitepointScrapingExecutor extends MultiPageScrapingExecutor {
       jobPosting.setTags(tags);
     }
 
-    jobPosting.setStatus("new");
-
     return jobPosting;
   }
 
