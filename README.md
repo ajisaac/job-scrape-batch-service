@@ -1,3 +1,4 @@
-# Deprecated - Replaced with go
+# Job Site Scraper
 
-Scrapes jobsites for certain postings, puts them in a database of some sort.
+This scraper application is capable of scraping a variety of 
+remote developer job sites.
