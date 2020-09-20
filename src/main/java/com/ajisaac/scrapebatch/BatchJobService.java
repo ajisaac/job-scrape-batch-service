@@ -1,7 +1,7 @@
 package com.ajisaac.scrapebatch;
 
+import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
-import com.ajisaac.scrapebatch.scrape.DatabaseService;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutor;
 import com.ajisaac.scrapebatch.webservice.Message;
@@ -28,7 +28,8 @@ public class BatchJobService {
   DatabaseService databaseService;
 
   // this is how we will keep track of currently scraped jobs
-  private List<ScrapingExecutorType> jobsInProgress = Collections.synchronizedList(new ArrayList<>());
+  private List<ScrapingExecutorType> jobsInProgress =
+      Collections.synchronizedList(new ArrayList<>());
 
   private final ListeningExecutorService executorService =
       MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
@@ -132,7 +133,7 @@ public class BatchJobService {
     return scrapeJob;
   }
 
-  public List<ScrapeJob> getAllScrapeJobs(){
+  public List<ScrapeJob> getAllScrapeJobs() {
     return databaseService.getAllScrapeJobs();
   }
 }

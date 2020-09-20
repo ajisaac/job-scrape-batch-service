@@ -12,7 +12,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
-import javax.persistence.Column;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
 package com.ajisaac.scrapebatch.scrape;
 
+import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 
