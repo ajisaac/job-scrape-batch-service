@@ -46,15 +46,16 @@ public class BatchJobService {
    * @return true if we are scraping, else false.
    */
   public boolean isCurrentlyScraping(long idNum) {
-    var s = databaseService.getScrapeJobById(idNum);
-    if (s.isPresent()) {
-      var type = ScrapingExecutorType.GetTypeFromScrapeJob(s.get());
-      var jobs = ImmutableList.copyOf(this.jobsInProgress);
+    Optional<ScrapeJob> s = databaseService.getScrapeJobById(idNum);
+    if (s.isEmpty()) {
+      return false;
+    }
+    ScrapingExecutorType type = ScrapingExecutorType.GetTypeFromScrapeJob(s.get());
+    ImmutableList<ScrapingExecutorType> jobs = ImmutableList.copyOf(this.jobsInProgress);
 
-      for (var j : jobs) {
-        if (j == type) {
-          return true;
-        }
+    for (ScrapingExecutorType j : jobs) {
+      if (j == type) {
+        return true;
       }
     }
     return false;
@@ -128,6 +129,7 @@ public class BatchJobService {
   }
 
   public ScrapeJob createScrapeJob(ScrapeJob scrapeJob) {
+    // todo check if it already exists
     checkNotNull(scrapeJob);
     scrapeJob = databaseService.storeScrapeJobInDatabase(scrapeJob);
     return scrapeJob;

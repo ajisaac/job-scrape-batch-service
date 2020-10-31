@@ -25,19 +25,27 @@ public class BatchController {
   @PostMapping("/scrape-job")
   public ResponseEntity submitJob(@RequestBody ScrapeJob scrapeJob) {
     scrapeJob = batchJobService.createScrapeJob(scrapeJob);
-    ScrapeJobValidation validation = new ScrapeJobValidation();
-    Optional<Message> errorMessage = validation.validate(scrapeJob);
-
-    // todo possibly return warnings as well
-
-    if(errorMessage.isPresent()){
-      return new ResponseEntity(errorMessage.get().getMessage(), HttpStatus.BAD_REQUEST);
-    }
     return new ResponseEntity(scrapeJob, HttpStatus.ACCEPTED);
   }
 
+  @PostMapping("/scrape-jobs")
+  public ResponseEntity submitJobs(@RequestBody List<ScrapeJob> scrapeJobs) {
+    List<ScrapeJob> createdJobs = new ArrayList<>();
+
+    for (ScrapeJob sj : scrapeJobs) {
+      try {
+        ScrapeJob scrapeJob = batchJobService.createScrapeJob(sj);
+        createdJobs.add(scrapeJob);
+      } catch (Exception ex) {
+        // eat it
+      }
+    }
+
+    return new ResponseEntity(createdJobs, HttpStatus.ACCEPTED);
+  }
+
   @GetMapping("/scrape-jobs")
-  public ResponseEntity<List<ScrapeJob>> getScrapeJobs(){
+  public ResponseEntity<List<ScrapeJob>> getScrapeJobs() {
     return new ResponseEntity<>(batchJobService.getAllScrapeJobs(), HttpStatus.OK);
   }
 
@@ -52,12 +60,10 @@ public class BatchController {
 
   @PostMapping("/scrape/{id}")
   public ResponseEntity<String> doScrape(@PathVariable String id) {
-    // if path variable is non numeric return error
     if (Strings.isBlank(id)) {
       return new ResponseEntity<>("Id must not be null.", HttpStatus.BAD_REQUEST);
     }
 
-    // if path variable is non numeric return error
     long idNum;
     try {
       idNum = Long.parseLong(id, 10);
@@ -69,7 +75,6 @@ public class BatchController {
       return new ResponseEntity<>("Id 0 not valid id.", HttpStatus.BAD_REQUEST);
     }
 
-    // if we're already scraping this one then alert us to this.
     if (batchJobService.isCurrentlyScraping(idNum)) {
       return new ResponseEntity<>("Already scraping this site.", HttpStatus.OK);
     }
@@ -77,7 +82,7 @@ public class BatchController {
     // we're good to scrape
     // this might return an error if the id isn't valid and so we should return that
     Optional<Message> message = batchJobService.doScrape(idNum);
-    if(message.isEmpty()){
+    if (message.isEmpty()) {
       return new ResponseEntity<>("Batch scrape job " + idNum + " submitted", HttpStatus.OK);
     }
     return new ResponseEntity<>(message.get().getMessage(), HttpStatus.BAD_REQUEST);
