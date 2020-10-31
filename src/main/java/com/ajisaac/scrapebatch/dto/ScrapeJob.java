@@ -6,10 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Objects;
 
 /** One of these holds all the data needed to handle a single scraping. */
 @Entity
-public class ScrapeJob{
+public class ScrapeJob {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -95,5 +96,31 @@ public class ScrapeJob{
 
   public void setSite(String site) {
     this.site = site;
+  }
+
+  /** weak compare using name and site */
+  public boolean weakEquals(ScrapeJob sj) {
+    return Objects.equals(site, sj.site) && Objects.equals(name, sj.name);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ScrapeJob scrapeJob = (ScrapeJob) o;
+    return id == scrapeJob.id
+        && remote == scrapeJob.remote
+        && radius == scrapeJob.radius
+        && Objects.equals(site, scrapeJob.site)
+        && Objects.equals(name, scrapeJob.name)
+        && Objects.equals(query, scrapeJob.query)
+        && Objects.equals(location, scrapeJob.location)
+        && Objects.equals(jobType, scrapeJob.jobType)
+        && Objects.equals(sortType, scrapeJob.sortType);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, site, name, query, location, remote, radius, jobType, sortType);
   }
 }

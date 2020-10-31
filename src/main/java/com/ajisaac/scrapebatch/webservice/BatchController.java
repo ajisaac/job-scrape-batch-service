@@ -22,33 +22,27 @@ public class BatchController {
     this.batchJobService = batchJobService;
   }
 
+  /** creates one scrape job */
   @PostMapping("/scrape-job")
   public ResponseEntity submitJob(@RequestBody ScrapeJob scrapeJob) {
     scrapeJob = batchJobService.createScrapeJob(scrapeJob);
     return new ResponseEntity(scrapeJob, HttpStatus.ACCEPTED);
   }
 
+  /** creates a bunch of jobs */
   @PostMapping("/scrape-jobs")
   public ResponseEntity submitJobs(@RequestBody List<ScrapeJob> scrapeJobs) {
-    List<ScrapeJob> createdJobs = new ArrayList<>();
-
-    for (ScrapeJob sj : scrapeJobs) {
-      try {
-        ScrapeJob scrapeJob = batchJobService.createScrapeJob(sj);
-        createdJobs.add(scrapeJob);
-      } catch (Exception ex) {
-        // eat it
-      }
-    }
-
+    List<ScrapeJob> createdJobs = batchJobService.createScrapeJobs(scrapeJobs);
     return new ResponseEntity(createdJobs, HttpStatus.ACCEPTED);
   }
 
+  /** gets all the scrape jobs */
   @GetMapping("/scrape-jobs")
   public ResponseEntity<List<ScrapeJob>> getScrapeJobs() {
     return new ResponseEntity<>(batchJobService.getAllScrapeJobs(), HttpStatus.OK);
   }
 
+  /** gets all the available job sites */
   @GetMapping("/sites")
   public ResponseEntity<List<String>> getSites() {
     List<String> sites = new ArrayList<>();

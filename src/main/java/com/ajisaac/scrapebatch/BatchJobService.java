@@ -12,10 +12,7 @@ import com.google.common.util.concurrent.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -128,12 +125,55 @@ public class BatchJobService {
     return Optional.empty();
   }
 
+
+  /** create a bunch of scrapeJobs */
+  public List<ScrapeJob> createScrapeJobs(List<ScrapeJob> scrapeJobs) {
+    if (scrapeJobs == null || scrapeJobs.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    List<ScrapeJob> existingJobs = getAllScrapeJobs();
+    List<ScrapeJob> createdJobs = new ArrayList<>();
+    for (ScrapeJob sj : scrapeJobs) {
+      Optional<ScrapeJob> esj = findScrapeJobIfExists(sj, existingJobs);
+      if (esj.isPresent()) {
+        createdJobs.add(esj.get());
+      } else {
+        sj = databaseService.storeScrapeJobInDatabase(sj);
+        createdJobs.add(sj);
+      }
+    }
+    return createdJobs;
+  }
+
+
+  /** create a single scrapeJob */
   public ScrapeJob createScrapeJob(ScrapeJob scrapeJob) {
-    // todo check if it already exists
     checkNotNull(scrapeJob);
+
+    List<ScrapeJob> existingJobs = getAllScrapeJobs();
+    Optional<ScrapeJob> ej = findScrapeJobIfExists(scrapeJob, existingJobs);
+    if (ej.isPresent()) {
+      return ej.get();
+    }
+
     scrapeJob = databaseService.storeScrapeJobInDatabase(scrapeJob);
     return scrapeJob;
   }
+
+
+  /** if the scrapeJob exists in existingJobs, return the version from existingJobs */
+  private Optional<ScrapeJob> findScrapeJobIfExists(
+      ScrapeJob scrapeJob, List<ScrapeJob> existingJobs) {
+
+    for (ScrapeJob ej : existingJobs) {
+      if (ej.weakEquals(scrapeJob)) {
+        return Optional.of(ej);
+      }
+    }
+    return Optional.empty();
+  }
+
 
   public List<ScrapeJob> getAllScrapeJobs() {
     return databaseService.getAllScrapeJobs();
