@@ -1,76 +1,93 @@
 package com.ajisaac.scrapebatch.scrape;
 
+import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
+import com.ajisaac.scrapebatch.network.PageGrabber;
+import com.ajisaac.scrapebatch.network.WebsocketNotifier;
+import com.ajisaac.scrapebatch.scraper.MultiPageScraper;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This type of class will have the ability to scrape a static non javascript site where all the
  * results are contained across multiple pages.
  */
-public abstract class MultiPageScrapingExecutor extends ScrapingExecutor {
+public class MultiPageScrapingExecutor implements ScrapingExecutor {
 
-  protected boolean hasMorePages = true;
+  private final MultiPageScraper scraper;
+  private DatabaseService databaseService;
+  private WebsocketNotifier notifier;
+  private final String name;
+
+  private boolean hasMorePages = true;
+  private int pauseTime = 10;
+
+  public MultiPageScrapingExecutor(MultiPageScraper scraper) {
+    this.scraper = scraper;
+    this.name = scraper.getJobSite().name();
+  }
+
+  public void setDatabaseService(DatabaseService databaseService) {
+    this.databaseService = databaseService;
+  }
+
+  @Override
+  public void setWebsocketNotifier(WebsocketNotifier notifier) {
+    this.notifier = notifier;
+  }
 
   /** Scrapes a job site once. */
-  @Override
   public void scrape() {
 
     while (hasMorePages) {
       pause(pauseTime);
       // get the page to scrape
-      URI uri = getNextMainPageURI();
-      if(uri == null){
-        // todo handle this
+      URI uri = scraper.getNextMainPageURI();
+      if (uri == null) {
+        break;
+      }
+      notifier.scrapingMainPage(uri.toString(), this.name);
+      String mainPage = PageGrabber.grabPage(uri);
+      if (mainPage == null) {
+        notifier.failMainPageScrape(uri.toString(), this.name);
         break;
       }
 
-      // make the request for that url
-      String mainPage = grabPage(uri);
-      if(mainPage == null){
-        // todo handle this
-        break;
-      }
-
-      List<JobPosting> jobPostings = parseMainPage(mainPage);
+      notifier.successfulMainPageScrape(uri.toString(), this.name);
+      List<JobPosting> jobPostings = scraper.parseMainPage(mainPage);
+      notifier.foundPostings(jobPostings.size(), this.name, uri.toString());
 
       for (JobPosting jobPosting : jobPostings) {
         pause(pauseTime);
-        try {
-          String jobDescriptionPage = grabPage(jobPosting.getHref());
-          if (jobDescriptionPage == null) {
-            continue;
-          }
-          jobPosting = parseJobDescriptionPage(jobDescriptionPage, jobPosting);
-        } catch (URISyntaxException e) {
-          e.printStackTrace();
-          // we simply won't store this job posting with any of it's details.
+        notifier.scrapingDescPage(jobPosting.getHref(), this.name);
+        String jobDescriptionPage = PageGrabber.grabPage(jobPosting.getHref());
+        if (jobDescriptionPage == null || jobDescriptionPage.isBlank()) {
+          notifier.failedDescPageScrape(jobPosting.getHref(), this.name);
+          continue;
         }
+        jobPosting = scraper.parseJobDescriptionPage(jobDescriptionPage);
         if (jobPosting != null) {
-          jobPosting = setJobSite(jobPosting);
+          notifier.successfulDescPageScrape(jobPosting, this.name);
+          jobPosting.setJobSite(scraper.getJobSite().name());
           jobPosting.setStatus("new");
-          super.storeInDatabase(jobPosting);
+          databaseService.storeJobPostingInDatabase(jobPosting);
         }
       }
     }
   }
 
-  /**
-   * If we are using a paginated site, we will need to call this to figure out what the next page to
-   * run is.
-   *
-   * @return The next URI to scrape.
-   */
-  protected abstract URI getNextMainPageURI();
-
-  /**
-   * Here we can update if we should keep scraping more pages.
-   *
-   * @param shouldKeepScraping Should we keep scraping more pages.
-   */
-  protected void updateShouldKeepScraping(boolean shouldKeepScraping) {
-    this.hasMorePages = shouldKeepScraping;
+  /** pause for random seconds to simulate being a human */
+  private void pause(int maxSeconds) {
+    try {
+      int r = ThreadLocalRandom.current().nextInt(maxSeconds) + 1;
+      notifier.sleeping(r, this.name);
+      TimeUnit.SECONDS.sleep(r);
+    } catch (InterruptedException e) {
+      notifier.error(e, this.name);
+      e.printStackTrace();
+    }
   }
 }

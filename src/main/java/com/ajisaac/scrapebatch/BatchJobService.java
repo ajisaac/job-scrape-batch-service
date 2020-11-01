@@ -1,12 +1,12 @@
 package com.ajisaac.scrapebatch;
 
 import com.ajisaac.scrapebatch.dto.DatabaseService;
+import com.ajisaac.scrapebatch.dto.JobPosting;
+import com.ajisaac.scrapebatch.dto.Link;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
+import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutor;
-import com.ajisaac.scrapebatch.webservice.Message;
-import com.ajisaac.scrapebatch.webservice.GenericMessage;
-import com.ajisaac.scrapebatch.webservice.ScrapeJobMessage;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,8 @@ public class BatchJobService {
   // takes our job and stores it in the data store
   DatabaseService databaseService;
 
+  WebsocketNotifier notifier;
+
   // this is how we will keep track of currently scraped jobs
   private List<ScrapingExecutorType> jobsInProgress =
       Collections.synchronizedList(new ArrayList<>());
@@ -32,8 +34,9 @@ public class BatchJobService {
       MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 
   @Autowired
-  public BatchJobService(DatabaseService databaseService) {
+  public BatchJobService(DatabaseService databaseService, WebsocketNotifier notifier) {
     this.databaseService = databaseService;
+    this.notifier = notifier;
   }
 
   /**
@@ -47,7 +50,7 @@ public class BatchJobService {
     if (s.isEmpty()) {
       return false;
     }
-    ScrapingExecutorType type = ScrapingExecutorType.GetTypeFromScrapeJob(s.get());
+    ScrapingExecutorType type = ScrapingExecutorType.getTypeFromScrapeJob(s.get());
     ImmutableList<ScrapingExecutorType> jobs = ImmutableList.copyOf(this.jobsInProgress);
 
     for (ScrapingExecutorType j : jobs) {
@@ -63,43 +66,38 @@ public class BatchJobService {
    *
    * @param idNum The id of the batch job.
    */
-  public Optional<Message> doScrape(long idNum) {
+  public String doScrape(long idNum) {
 
     // we're given this isNum, which relates to a particular batch job
     Optional<ScrapeJob> scrapeJob = databaseService.getScrapeJobById(idNum);
     if (scrapeJob.isEmpty()) {
-      return Optional.of(ScrapeJobMessage.JOB_NOT_FOUND);
+      return "Job Not Found";
     }
 
     // get the scraping executor type
-    ScrapingExecutorType executorType = ScrapingExecutorType.GetTypeFromScrapeJob(scrapeJob.get());
+    ScrapingExecutorType executorType = ScrapingExecutorType.getTypeFromScrapeJob(scrapeJob.get());
     if (executorType == null) {
-      return Optional.of(ScrapeJobMessage.JOB_SITE_NOT_VALID);
+      return "Job Site Not Found";
     }
-
-    // create the executor
-    ScrapingExecutor executor = executorType.getInstance();
-    if (executor == null) {
-      return Optional.of(GenericMessage.EXECUTOR_NOT_AVAILABLE);
-    }
-    executor.setScrapeJob(scrapeJob.get());
-    executor.setDatabaseService(databaseService);
 
     // check if we are already executing this job
-    boolean alreadyExecuting = false;
     ImmutableList<ScrapingExecutorType> types = ImmutableList.copyOf(this.jobsInProgress);
     for (ScrapingExecutorType type : types) {
       if (executorType.equals(type)) {
-        alreadyExecuting = true;
-        break;
+        return "Already Scraping this Site";
       }
     }
-    if (alreadyExecuting) {
-      return Optional.of(ScrapeJobMessage.ALREADY_EXECUTING);
+
+    // get us an executor for this job site
+    ScrapingExecutor executor = ScrapingExecutorType.getInstance(scrapeJob.get());
+    if (executor == null) {
+      return "Executor Not Available";
     }
+    executor.setDatabaseService(databaseService);
+    executor.setWebsocketNotifier(notifier);
 
+    // execute
     jobsInProgress.add(executorType);
-
     ListenableFuture<ScrapingExecutor> scrapingExecutorFuture =
         executorService.submit(
             () -> {
@@ -107,6 +105,7 @@ public class BatchJobService {
               return executor;
             });
 
+    // when the job is done we can let other people be made aware
     Futures.addCallback(
         scrapingExecutorFuture,
         new FutureCallback<>() {
@@ -122,9 +121,9 @@ public class BatchJobService {
         },
         executorService);
 
-    return Optional.empty();
+    // this was a success
+    return null;
   }
-
 
   /** create a bunch of scrapeJobs */
   public List<ScrapeJob> createScrapeJobs(List<ScrapeJob> scrapeJobs) {
@@ -146,7 +145,6 @@ public class BatchJobService {
     return createdJobs;
   }
 
-
   /** create a single scrapeJob */
   public ScrapeJob createScrapeJob(ScrapeJob scrapeJob) {
     checkNotNull(scrapeJob);
@@ -161,7 +159,6 @@ public class BatchJobService {
     return scrapeJob;
   }
 
-
   /** if the scrapeJob exists in existingJobs, return the version from existingJobs */
   private Optional<ScrapeJob> findScrapeJobIfExists(
       ScrapeJob scrapeJob, List<ScrapeJob> existingJobs) {
@@ -174,8 +171,20 @@ public class BatchJobService {
     return Optional.empty();
   }
 
-
   public List<ScrapeJob> getAllScrapeJobs() {
     return databaseService.getAllScrapeJobs();
+  }
+
+  /** given a link, try to scrape that job posting */
+  public Optional<JobPosting> scrapeSingleJobLink(Link link) {
+    // determine job site type
+    ScrapingExecutorType type = ScrapingExecutorType.determineSiteFromUrl(link);
+    if (type == null) {
+      return Optional.empty();
+    }
+
+    // submit link to be scraped
+
+    return Optional.empty();
   }
 }

@@ -1,48 +1,47 @@
 package com.ajisaac.scrapebatch.scrape;
 
+import com.ajisaac.scrapebatch.dto.Link;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
-import com.ajisaac.scrapebatch.sites.indeed.IndeedScrapingExecutor;
-import com.ajisaac.scrapebatch.sites.remoteco.RemotecoScrapingExecutor;
-import com.ajisaac.scrapebatch.sites.remoteokio.RemoteokioScrapingExecutor;
-import com.ajisaac.scrapebatch.sites.remotiveio.RemotiveioScrapingExecutor;
-import com.ajisaac.scrapebatch.sites.sitepoint.SitepointScrapingExecutor;
-import com.ajisaac.scrapebatch.sites.stackoverflow.StackoverflowScrapingExecutor;
-import com.ajisaac.scrapebatch.sites.weworkremotely.WwrScrapingExecutor;
-import com.ajisaac.scrapebatch.sites.workingnomads.WorkingNomadsScrapingExecutor;
-
-import java.lang.reflect.InvocationTargetException;
+import com.ajisaac.scrapebatch.scraper.*;
 
 public enum ScrapingExecutorType {
-  INDEED(IndeedScrapingExecutor.class),
-  WWR(WwrScrapingExecutor.class),
-  REMOTIVEIO(RemotiveioScrapingExecutor.class),
-  REMOTECO(RemotecoScrapingExecutor.class),
-  REMOTEOKIO(RemoteokioScrapingExecutor.class),
-  SITEPOINT(SitepointScrapingExecutor.class),
-  STACKOVERFLOW(StackoverflowScrapingExecutor.class),
-  WORKINGNOMADS(WorkingNomadsScrapingExecutor.class);
+  INDEED("indeed.com"),
+  WWR("weworkremotely.com"),
+  REMOTIVEIO("remotive.io"),
+  REMOTECO("remote.co"),
+  REMOTEOKIO("remoteok.io"),
+  SITEPOINT("sitepoint.com"),
+  STACKOVERFLOW("stackoverflow.com"),
+  WORKINGNOMADS("workingnomads.com");
   //  workew
   //  github
   //  ycombinator
   //  flexjobs
 
-  Class<? extends ScrapingExecutor> clazz;
+  private final String baseUrl;
 
-  ScrapingExecutorType(Class<? extends ScrapingExecutor> clazz) {
-    this.clazz = clazz;
+  ScrapingExecutorType(String baseUrl) {
+    this.baseUrl = baseUrl;
   }
 
-  public Class<? extends ScrapingExecutor> getClazz() {
-    return this.clazz;
+  /** given a link, determine which site it's related to */
+  public static ScrapingExecutorType determineSiteFromUrl(Link link) {
+    if (link == null || link.getLink().isBlank()) {
+      return null;
+    }
+
+    String url = link.getLink();
+    for (ScrapingExecutorType s : ScrapingExecutorType.values()) {
+      if (url.contains(s.baseUrl)) {
+        return s;
+      }
+    }
+
+    return null;
   }
 
-  /**
-   * For a generic ScrapeJob, gets the ScrapingExecutorType or null;
-   *
-   * @param scrapeJob
-   * @return
-   */
-  public static ScrapingExecutorType GetTypeFromScrapeJob(ScrapeJob scrapeJob) {
+  /** for a generic ScrapeJob, gets the ScrapingExecutorType or null */
+  public static ScrapingExecutorType getTypeFromScrapeJob(ScrapeJob scrapeJob) {
     try {
       return ScrapingExecutorType.valueOf(scrapeJob.getSite());
     } catch (IllegalArgumentException ex) {
@@ -50,19 +49,38 @@ public enum ScrapingExecutorType {
     }
   }
 
-  /**
-   * Creates a new instance of the ScrapingExecutor of a particular type.
-   *
-   * @return
-   */
-  public ScrapingExecutor getInstance() {
-    try {
-      return this.clazz.getDeclaredConstructor().newInstance();
-    } catch (InstantiationException
-        | NoSuchMethodException
-        | IllegalAccessException
-        | InvocationTargetException e) {
+  /** given the scrapeJob, get an executor for it */
+  public static ScrapingExecutor getInstance(ScrapeJob scrapeJob) {
+    ScrapingExecutorType type = getTypeFromScrapeJob(scrapeJob);
+    if (type == null) {
       return null;
     }
+    switch (type) {
+      case INDEED:
+        IndeedScraper indeedScraper = new IndeedScraper(scrapeJob);
+        return new MultiPageScrapingExecutor(indeedScraper);
+      case WWR:
+        SinglePageScraper wwrScraper = new WwrScraper(scrapeJob);
+        return new SinglePageScrapingExecutor(wwrScraper);
+      case REMOTIVEIO:
+        SinglePageScraper remoteivioScraper = new RemoteivioScraper(scrapeJob);
+        return new SinglePageScrapingExecutor(remoteivioScraper);
+      case REMOTECO:
+        SinglePageScraper remotecoScraper = new RemotecoScraper(scrapeJob);
+        return new SinglePageScrapingExecutor(remotecoScraper);
+      case REMOTEOKIO:
+        SinglePageScraper remoteokioScraper = new RemoteokioScraper(scrapeJob);
+        return new SinglePageScrapingExecutor(remoteokioScraper);
+      case SITEPOINT:
+        MultiPageScraper sitepointScraper = new SitepointScraper(scrapeJob);
+        return new MultiPageScrapingExecutor(sitepointScraper);
+      case STACKOVERFLOW:
+        MultiPageScraper stackoverflowScraper = new StackoverflowScraper(scrapeJob);
+        return new MultiPageScrapingExecutor(stackoverflowScraper);
+      case WORKINGNOMADS:
+        SinglePageScraper workingnomadsScraper = new WorkingNomadsScraper(scrapeJob);
+        return new SinglePageScrapingExecutor(workingnomadsScraper);
+    }
+    return null;
   }
 }
