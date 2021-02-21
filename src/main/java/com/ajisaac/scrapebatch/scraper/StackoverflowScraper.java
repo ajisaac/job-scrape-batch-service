@@ -22,9 +22,9 @@ public class StackoverflowScraper implements MultiPageScraper {
   private boolean shouldKeepScraping = true;
 
   private final ScrapeJob scrapeJob;
+
   public StackoverflowScraper(ScrapeJob scrapeJob) {
     this.scrapeJob = scrapeJob;
-
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {
@@ -83,18 +83,15 @@ public class StackoverflowScraper implements MultiPageScraper {
     return jobPostings;
   }
 
-  @Override
-  public JobPosting parseJobDescriptionPage(String html) {
-    return null;
-  }
-
   private boolean hasMoreResults(Document document) {
     Element next = document.selectFirst("head>link[rel=next]");
     return next != null;
   }
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
+  @Override
+  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
 
+    JobPosting jobPosting = new JobPosting();
     Document document = Jsoup.parse(jobDescriptionPage);
     Element jsonData = document.selectFirst("script[type=\"application/ld+json\"]");
     if (jsonData == null) {

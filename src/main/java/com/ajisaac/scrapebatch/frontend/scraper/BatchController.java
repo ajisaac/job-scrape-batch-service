@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch;
+package com.ajisaac.scrapebatch.frontend.scraper;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.Link;
