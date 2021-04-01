@@ -21,6 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .authorizeRequests()
       .anyRequest()
       .permitAll();
+
   }
 
 
