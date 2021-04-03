@@ -10,7 +10,6 @@ import javax.persistence.Id;
 
 /**
  * Represents the title of a job in which we aren't interested.
- * // test
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,3 +38,4 @@ public final class BlockTitle {
     this.name = name;
   }
 }
+
