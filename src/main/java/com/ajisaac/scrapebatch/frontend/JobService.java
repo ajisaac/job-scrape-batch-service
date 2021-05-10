@@ -37,14 +37,14 @@ public class JobService {
     Map<String, List<JobPosting>> companyMap = new HashMap<>();
 
     // sort by company
-    for(JobPosting job : jobPostings){
+    for (JobPosting job : jobPostings) {
       String company = Strings.nullToEmpty(job.getCompany());
-      if(company.isBlank()){
+      if (company.isBlank()) {
         company = "unknown";
       }
-      if(companyMap.containsKey(company)){
+      if (companyMap.containsKey(company)) {
         companyMap.get(company).add(job);
-      }else{
+      } else {
         List<JobPosting> list = new ArrayList<>();
         list.add(job);
         companyMap.put(company, list);
@@ -54,7 +54,7 @@ public class JobService {
     // map the map to list of companies
     long id = 1;
     Companies companies = new Companies();
-    for(Map.Entry<String, List<JobPosting>> entrySet : companyMap.entrySet()){
+    for (Map.Entry<String, List<JobPosting>> entrySet : companyMap.entrySet()) {
       Company company = new Company(id++, entrySet.getKey(), entrySet.getValue());
       companies.addCompany(company);
     }
@@ -62,13 +62,16 @@ public class JobService {
     return companies;
   }
 
+  /**
+   * update the given job with a new status
+   */
   public JobPosting updateJobStatus(Long id, String status) {
     Status s = Status.getStatusByName(status);
-    if(s == null){
+    if (s == null) {
       return null;
     }
     Optional<JobPosting> optionalJobStatus = databaseService.getJobById(id);
-    if(optionalJobStatus.isEmpty()){
+    if (optionalJobStatus.isEmpty()) {
       return null;
     }
     JobPosting jobPosting = optionalJobStatus.get();
@@ -77,17 +80,23 @@ public class JobService {
     return jobPosting;
   }
 
+  /**
+   * Update multiple jobs with the status specified
+   */
   public List<JobPosting> updateMultipleJobStatuses(List<Long> jobStatuses, String status) {
     List<JobPosting> jobPostings = new ArrayList<>();
-    for(Long id : jobStatuses){
+    for (Long id : jobStatuses) {
       JobPosting jobPosting = updateJobStatus(id, status);
-      if(jobPosting != null){
+      if (jobPosting != null) {
         jobPostings.add(jobPosting);
       }
     }
     return jobPostings;
   }
 
+  /**
+   * Get all the blacklisted companies
+   */
   public List<String> getBlacklistedCompanies() {
     return databaseService.getAllBlacklistedCompanies();
   }

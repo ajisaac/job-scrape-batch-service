@@ -36,13 +36,13 @@ public class JobResource {
 
   @PutMapping("/status/{id}/{status}")
   public ResponseEntity updateJobStatus(
-      @PathVariable("id")
-          @Min(1)
-          @Positive
-          @NotBlank
-          @Digits(message = "Id must be integral.", integer = 10, fraction = 10)
-          Long id,
-      @PathVariable("status") @NotBlank String status) {
+    @PathVariable("id")
+    @Min(1)
+    @Positive
+    @NotBlank
+    @Digits(message = "Id must be integral.", integer = 10, fraction = 10)
+      Long id,
+    @PathVariable("status") @NotBlank String status) {
     JobPosting jobPosting = jobService.updateJobStatus(id, status);
     if (jobPosting == null) {
       return new ResponseEntity<>("Unable to update status.", HttpStatus.BAD_REQUEST);
@@ -52,7 +52,7 @@ public class JobResource {
 
   @PutMapping("/status/multiple/{status}")
   public ResponseEntity updateMultipleJobStatuses(
-      @RequestBody List<Long> jobStatuses, @PathVariable("status") @NotBlank String status) {
+    @RequestBody List<Long> jobStatuses, @PathVariable("status") @NotBlank String status) {
     List<JobPosting> jobPostings = jobService.updateMultipleJobStatuses(jobStatuses, status);
     return new ResponseEntity<>(jobPostings, HttpStatus.OK);
   }
