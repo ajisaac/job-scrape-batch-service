@@ -45,7 +45,9 @@ public class RemotecoScraper implements SinglePageScraper {
     return jobPostings;
   }
 
-  /** Parse the basic job that we got from the main page. */
+  /**
+   * Parse the basic job that we got from the main page.
+   */
   private JobPosting parseBasicJobPosting(Element job) {
 
     JobPosting jobPosting = new JobPosting();
@@ -79,19 +81,19 @@ public class RemotecoScraper implements SinglePageScraper {
     }
   }
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
 
     Document document = Jsoup.parse(jobDescriptionPage);
     Element jsonData = document.selectFirst("body>script[type=\"application/ld+json\"]");
     if (jsonData == null) {
       // we still have the URL at least
-      return new JobPosting();
+      return;
     }
 
     // all our data comes in a json object, so we will read that object.
     List<Node> nodes = jsonData.childNodes();
     if (nodes.isEmpty()) {
-      return new JobPosting();
+      return;
     }
 
     Node n = nodes.get(0);
@@ -101,14 +103,13 @@ public class RemotecoScraper implements SinglePageScraper {
     String description = parseDescription(json);
     if (description == null) {
       // just fail fast if no description.
-      return new JobPosting();
+      return;
     }
-    JobPosting jobPosting = new JobPosting();
     jobPosting.setDescription(description);
 
     json = cleanJson(json);
     if (json == null) {
-      return jobPosting;
+      return;
     }
 
     JsonNode node;
@@ -116,7 +117,7 @@ public class RemotecoScraper implements SinglePageScraper {
       ObjectMapper objectMapper = new ObjectMapper();
       node = objectMapper.readTree(json);
     } catch (JsonProcessingException e) {
-      return jobPosting;
+      return;
     }
 
     JsonNode title = node.get("title");
@@ -145,8 +146,6 @@ public class RemotecoScraper implements SinglePageScraper {
         jobPosting.setCompany(name.asText());
       }
     }
-
-    return jobPosting;
   }
 
   @Override

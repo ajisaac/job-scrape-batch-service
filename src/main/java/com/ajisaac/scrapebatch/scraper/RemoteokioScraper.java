@@ -3,7 +3,6 @@ package com.ajisaac.scrapebatch.scraper;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import com.ajisaac.scrapebatch.scrape.SinglePageScrapingExecutor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -64,11 +63,6 @@ public class RemoteokioScraper implements SinglePageScraper {
       }
     }
     return jobPostings;
-  }
-
-  @Override
-  public JobPosting parseJobDescriptionPage(String html) {
-    return null;
   }
 
   @Override
@@ -150,8 +144,8 @@ public class RemoteokioScraper implements SinglePageScraper {
     return jobPosting;
   }
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
-    return jobPosting;
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
+    throw new RuntimeException();
   }
 
   public JobPosting setJobSite(JobPosting jobPosting) {

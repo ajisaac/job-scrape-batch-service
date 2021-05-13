@@ -62,18 +62,18 @@ public class RemoteivioScraper implements SinglePageScraper {
     return jobPosting;
   }
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
     Document document = Jsoup.parse(jobDescriptionPage);
     Element jsonData = document.selectFirst("html>head>script[type=\"application/ld+json\"]");
     if (jsonData == null) {
       // we still have the URL at least
-      return new JobPosting();
+      return;
     }
 
     // all our data comes in a json object, so we will read that object.
     List<Node> nodes = jsonData.childNodes();
     if (nodes.isEmpty()) {
-      return new JobPosting();
+      return;
     }
 
     String json = nodes.get(0).toString().trim();
@@ -81,10 +81,9 @@ public class RemoteivioScraper implements SinglePageScraper {
     try {
       node = new ObjectMapper().readTree(json);
     } catch (JsonProcessingException e) {
-      return new JobPosting();
+      return;
     }
 
-    JobPosting jobPosting = new JobPosting();
     JsonNode description = node.get("description");
     if (description != null) {
       jobPosting.setDescription(description.asText());
@@ -128,8 +127,6 @@ public class RemoteivioScraper implements SinglePageScraper {
         jobPosting.setMiscText(misc + " - " + name.asText());
       }
     }
-
-    return jobPosting;
   }
 
   @Override

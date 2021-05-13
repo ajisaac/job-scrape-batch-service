@@ -31,17 +31,15 @@ public class IndeedScraper implements MultiPageScraper {
   }
 
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
+  // modifies the job posting fleshing it out a bit
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
 
     Element parsed = Jsoup.parse(jobDescriptionPage);
     Element text = parsed.getElementById("jobDescriptionText");
     if (text != null) {
       String description = text.toString().trim();
-      JobPosting jobPosting = new JobPosting();
       jobPosting.setDescription(description);
-      return jobPosting;
     }
-    return new JobPosting();
   }
 
   @Override

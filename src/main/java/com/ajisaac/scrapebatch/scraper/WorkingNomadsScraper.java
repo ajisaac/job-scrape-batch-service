@@ -103,8 +103,7 @@ public class WorkingNomadsScraper implements SinglePageScraper {
     return jobPostings;
   }
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
-    return new JobPosting();
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
   }
 
   public ScrapingExecutorType getJobSite() {

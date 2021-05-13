@@ -67,7 +67,7 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
           notifier.failedDescPageScrape(jobPosting.getHref(), this.name);
           continue;
         }
-        jobPosting = scraper.parseJobDescriptionPage(jobDescriptionPage);
+        scraper.parseJobDescriptionPage(jobDescriptionPage, jobPosting);
       }
       if (jobPosting != null) {
         notifier.successfulDescPageScrape(jobPosting, this.name);

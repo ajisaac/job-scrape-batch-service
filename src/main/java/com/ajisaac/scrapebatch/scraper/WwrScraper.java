@@ -94,10 +94,10 @@ public class WwrScraper implements SinglePageScraper {
     return jobPosting;
   }
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
     // validate
     if (jobDescriptionPage == null || jobDescriptionPage.isBlank()) {
-      return new JobPosting();
+      return;
     }
 
     // get main content
@@ -105,10 +105,9 @@ public class WwrScraper implements SinglePageScraper {
     Elements contents = document.getElementsByClass("content");
     Element content = contents.first();
     if (content == null) {
-      return new JobPosting();
+      return;
     }
 
-    JobPosting jobPosting = new JobPosting();
     // get date posted
     Elements times = content.getElementsByTag("time");
     Element time = times.first();
@@ -141,8 +140,6 @@ public class WwrScraper implements SinglePageScraper {
       String text = description.toString().trim();
       jobPosting.setDescription(text);
     }
-
-    return jobPosting;
   }
 
   @Override

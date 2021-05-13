@@ -11,7 +11,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -87,19 +86,18 @@ public class SitepointScraper implements MultiPageScraper {
     return jobPosting;
   }
 
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
-    JobPosting jobPosting = new JobPosting();
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
     Document document = Jsoup.parse(jobDescriptionPage);
     Element jsonData = document.selectFirst("script[type=\"application/ld+json\"]");
     if (jsonData == null) {
       // we still have the URL at least
-      return jobPosting;
+      return;
     }
 
     // all our data comes in a json object, so we will read that object.
     List<Node> nodes = jsonData.childNodes();
     if (nodes.isEmpty()) {
-      return jobPosting;
+      return;
     }
 
     Node n = nodes.get(0);
@@ -110,7 +108,7 @@ public class SitepointScraper implements MultiPageScraper {
       ObjectMapper objectMapper = new ObjectMapper();
       node = objectMapper.readTree(json);
     } catch (JsonProcessingException e) {
-      return jobPosting;
+      return;
     }
 
     JsonNode datePosted = node.get("datePosted");
@@ -122,8 +120,6 @@ public class SitepointScraper implements MultiPageScraper {
     if (description != null) {
       jobPosting.setDescription(description.asText());
     }
-
-    return jobPosting;
   }
 
   @Override

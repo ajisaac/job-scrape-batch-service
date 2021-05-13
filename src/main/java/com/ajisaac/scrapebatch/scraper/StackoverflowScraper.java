@@ -89,20 +89,19 @@ public class StackoverflowScraper implements MultiPageScraper {
   }
 
   @Override
-  public JobPosting parseJobDescriptionPage(String jobDescriptionPage) {
+  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
 
-    JobPosting jobPosting = new JobPosting();
     Document document = Jsoup.parse(jobDescriptionPage);
     Element jsonData = document.selectFirst("script[type=\"application/ld+json\"]");
     if (jsonData == null) {
       // we still have the URL at least
-      return jobPosting;
+      return;
     }
 
     // all our data comes in a json object, so we will read that object.
     List<Node> nodes = jsonData.childNodes();
     if (nodes.isEmpty()) {
-      return jobPosting;
+      return;
     }
 
     Node n = nodes.get(0);
@@ -113,7 +112,7 @@ public class StackoverflowScraper implements MultiPageScraper {
       ObjectMapper objectMapper = new ObjectMapper();
       node = objectMapper.readTree(json);
     } catch (JsonProcessingException e) {
-      return jobPosting;
+      return;
     }
 
     // date
@@ -153,8 +152,6 @@ public class StackoverflowScraper implements MultiPageScraper {
         jobPosting.setCompany(name.asText());
       }
     }
-
-    return jobPosting;
   }
 
   @Override

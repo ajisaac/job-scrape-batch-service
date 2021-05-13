@@ -11,7 +11,7 @@ public interface Scraper {
   List<JobPosting> parseMainPage(String html);
 
   /** given a "job description" page, try to parse it */
-  JobPosting parseJobDescriptionPage(String html);
+  void parseJobDescriptionPage(String html, JobPosting jobPosting);
 
   /** get the job site */
   ScrapingExecutorType getJobSite();
