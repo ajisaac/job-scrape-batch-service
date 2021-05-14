@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch.scraper;
+package com.ajisaac.scrapebatch.scrape;
 
 import java.net.URI;
 

@@ -17,7 +17,9 @@ import java.util.concurrent.Executors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/** Business logic for handling batch jobs, this is our singleton manager class */
+/**
+ * Business logic for handling batch jobs, this is our singleton manager class
+ */
 @Service
 public class BatchJobService {
 
@@ -28,10 +30,10 @@ public class BatchJobService {
 
   // this is how we will keep track of currently scraped jobs
   private List<ScrapingExecutorType> jobsInProgress =
-      Collections.synchronizedList(new ArrayList<>());
+    Collections.synchronizedList(new ArrayList<>());
 
   private final ListeningExecutorService executorService =
-      MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
+    MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 
   @Autowired
   public BatchJobService(DatabaseService databaseService, WebsocketNotifier notifier) {
@@ -41,9 +43,6 @@ public class BatchJobService {
 
   /**
    * Are we currently scraping this job site.
-   *
-   * @param idNum The id of a particular batch scrape job.
-   * @return true if we are scraping, else false.
    */
   public boolean isCurrentlyScraping(long idNum) {
     Optional<ScrapeJob> s = databaseService.getScrapeJobById(idNum);
@@ -99,33 +98,35 @@ public class BatchJobService {
     // execute
     jobsInProgress.add(executorType);
     ListenableFuture<ScrapingExecutor> scrapingExecutorFuture =
-        executorService.submit(
-            () -> {
-              executor.scrape();
-              return executor;
-            });
+      executorService.submit(
+        () -> {
+          executor.scrape();
+          return executor;
+        });
 
     // when the job is done we can let other people be made aware
     Futures.addCallback(
-        scrapingExecutorFuture,
-        new FutureCallback<>() {
-          @Override
-          public void onSuccess(ScrapingExecutor result) {
-            jobsInProgress.remove(executorType);
-          }
+      scrapingExecutorFuture,
+      new FutureCallback<>() {
+        @Override
+        public void onSuccess(ScrapingExecutor result) {
+          jobsInProgress.remove(executorType);
+        }
 
-          @Override
-          public void onFailure(Throwable t) {
-            jobsInProgress.remove(executorType);
-          }
-        },
-        executorService);
+        @Override
+        public void onFailure(Throwable t) {
+          jobsInProgress.remove(executorType);
+        }
+      },
+      executorService);
 
     // this was a success
     return null;
   }
 
-  /** create a bunch of scrapeJobs */
+  /**
+   * create a bunch of scrapeJobs
+   */
   public List<ScrapeJob> createScrapeJobs(List<ScrapeJob> scrapeJobs) {
     if (scrapeJobs == null || scrapeJobs.isEmpty()) {
       return new ArrayList<>();
@@ -145,7 +146,9 @@ public class BatchJobService {
     return createdJobs;
   }
 
-  /** create a single scrapeJob */
+  /**
+   * create a single scrapeJob
+   */
   public ScrapeJob createScrapeJob(ScrapeJob scrapeJob) {
     checkNotNull(scrapeJob);
 
@@ -159,9 +162,11 @@ public class BatchJobService {
     return scrapeJob;
   }
 
-  /** if the scrapeJob exists in existingJobs, return the version from existingJobs */
+  /**
+   * if the scrapeJob exists in existingJobs, return the version from existingJobs
+   */
   private Optional<ScrapeJob> findScrapeJobIfExists(
-      ScrapeJob scrapeJob, List<ScrapeJob> existingJobs) {
+    ScrapeJob scrapeJob, List<ScrapeJob> existingJobs) {
 
     for (ScrapeJob ej : existingJobs) {
       if (ej.weakEquals(scrapeJob)) {
@@ -175,7 +180,9 @@ public class BatchJobService {
     return databaseService.getAllScrapeJobs();
   }
 
-  /** given a link, try to scrape that job posting */
+  /**
+   * given a link, try to scrape that job posting
+   */
   public Optional<JobPosting> scrapeSingleJobLink(Link link) {
     // determine job site type
     ScrapingExecutorType type = ScrapingExecutorType.determineSiteFromUrl(link);

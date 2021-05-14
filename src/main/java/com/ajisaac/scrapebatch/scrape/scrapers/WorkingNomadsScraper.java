@@ -1,8 +1,9 @@
-package com.ajisaac.scrapebatch.scraper;
+package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
+import com.ajisaac.scrapebatch.scrape.SinglePageScraper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +16,6 @@ public class WorkingNomadsScraper implements SinglePageScraper {
 
   public WorkingNomadsScraper(ScrapeJob scrapeJob) {
     this.scrapeJob = scrapeJob;
-
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {

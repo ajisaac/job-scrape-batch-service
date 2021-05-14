@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch.scraper;
+package com.ajisaac.scrapebatch.scrape;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;

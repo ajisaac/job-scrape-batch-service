@@ -1,8 +1,9 @@
-package com.ajisaac.scrapebatch.scraper;
+package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
+import com.ajisaac.scrapebatch.scrape.SinglePageScraper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
