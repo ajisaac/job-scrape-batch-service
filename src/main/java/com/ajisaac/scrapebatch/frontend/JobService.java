@@ -10,22 +10,22 @@ import java.util.*;
 @Service
 public class JobService {
 
-  private final DatabaseService dbService;
+  private final DatabaseService db;
 
   @Autowired
-  public JobService(DatabaseService dbService) {
-    this.dbService = dbService;
+  public JobService(DatabaseService db) {
+    this.db = db;
 
   }
 
   public List<JobPosting> getAllJobs() {
-    return dbService.getAllJobPostings();
+    return db.getAllJobPostings();
   }
 
   public Companies getAllJobsByCompany() {
     Map<String, List<JobPosting>> cMap = new HashMap<>();
 
-    for (JobPosting job : dbService.getAllJobPostings()) {
+    for (JobPosting job : db.getAllJobPostings()) {
       var c = Strings.nullToEmpty(job.getCompany());
 
       if (c.isBlank())
@@ -56,13 +56,13 @@ public class JobService {
     if (s == null)
       return null;
 
-    Optional<JobPosting> optionalJobStatus = dbService.getJobById(id);
-    if (optionalJobStatus.isEmpty())
+    var optionalJobStatus = db.getJobById(id);
+    if (optionalJobStatus == null)
       return null;
 
-    var jobPosting = optionalJobStatus.get();
+    var jobPosting = optionalJobStatus;
     jobPosting.setStatus(s.getLowercase());
-    jobPosting = dbService.updateJobPosting(jobPosting);
+    jobPosting = db.updateJobPosting(jobPosting);
     return jobPosting;
   }
 
@@ -82,9 +82,9 @@ public class JobService {
     if (Strings.nullToEmpty(posting.getHref()).isBlank())
       return;
 
-    List<JobPosting> dupeJobs = dbService.getJobByHref(posting.getHref());
+    List<JobPosting> dupeJobs = db.getJobByHref(posting.getHref());
 
     if (dupeJobs.isEmpty())
-      dbService.storeJobPostingInDatabase(posting);
+      db.storeJobPostingInDatabase(posting);
   }
 }

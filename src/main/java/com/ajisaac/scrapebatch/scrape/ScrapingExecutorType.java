@@ -28,24 +28,6 @@ public enum ScrapingExecutorType {
   }
 
   /**
-   * given a link, determine which site it's related to
-   */
-  public static ScrapingExecutorType determineSiteFromUrl(Link link) {
-    if (link == null || link.getLink().isBlank()) {
-      return null;
-    }
-
-    String url = link.getLink();
-    for (ScrapingExecutorType s : ScrapingExecutorType.values()) {
-      if (url.contains(s.baseUrl)) {
-        return s;
-      }
-    }
-
-    return null;
-  }
-
-  /**
    * for a generic ScrapeJob, gets the ScrapingExecutorType or null
    */
   public static ScrapingExecutorType getTypeFromScrapeJob(ScrapeJob scrapeJob) {

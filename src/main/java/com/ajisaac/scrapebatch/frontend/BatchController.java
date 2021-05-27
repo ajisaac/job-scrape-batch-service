@@ -23,9 +23,12 @@ public class BatchController {
   // todo fix all this weirdness, return proper responses if failure
 
   @PostMapping("/scrape-job")
-  public ResponseEntity createScrapeJob(@RequestBody ScrapeJob scrapeJob) {
+  public ResponseEntity<ScrapeJob> createScrapeJob(@RequestBody ScrapeJob scrapeJob) {
     scrapeJob = batchJobService.createScrapeJob(scrapeJob);
-    return new ResponseEntity(scrapeJob, HttpStatus.ACCEPTED);
+    if (scrapeJob == null)
+      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+
+    return new ResponseEntity<>(scrapeJob, HttpStatus.ACCEPTED);
   }
 
   @PostMapping("/scrape-jobs")

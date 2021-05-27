@@ -26,31 +26,27 @@ public final class DatabaseService {
     return jobPostingRepository.findAll();
   }
 
-  public Optional<JobPosting> getJobById(Long id) {
-    return jobPostingRepository.findById(id);
+  public JobPosting getJobById(Long id) {
+    return jobPostingRepository.findById(id).orElse(null);
   }
 
-  public JobPosting updateJobPosting(JobPosting jobPosting) {
-    if (jobPosting == null)
+  public JobPosting updateJobPosting(JobPosting jp) {
+    if (jp == null)
       return null;
-
-    return jobPostingRepository.save(jobPosting);
+    return jobPostingRepository.save(jp);
   }
 
 
-  public void storeJobPostingInDatabase(JobPosting jobPosting) {
-    if (jobPosting == null)
+  public void storeJobPostingInDatabase(JobPosting jp) {
+    if (jp == null)
       return;
-    jobPostingRepository.save(jobPosting);
+    jobPostingRepository.save(jp);
   }
 
-  public ScrapeJob storeScrapeJobInDatabase(ScrapeJob scrapeJob) {
-    if(scrapeJob == null)
+  public ScrapeJob storeScrapeJobInDatabase(ScrapeJob sj) {
+    if (sj == null)
       return null;
-
-    checkNotNull(scrapeJob, "Can't save null scrapeJob.");
-    scrapeJob = scrapeJobRepository.save(scrapeJob);
-    return scrapeJob;
+    return scrapeJobRepository.save(sj);
   }
 
   public ScrapeJob getScrapeJobById(long idNum) {
