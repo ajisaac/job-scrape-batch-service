@@ -54,11 +54,10 @@ public class BatchController {
     if (batchJobService.isCurrentlyScraping(id))
       return new ResponseEntity<>("Already scraping this site.", HttpStatus.OK);
 
-    String message = batchJobService.doScrape(id);
-    if (message == null)
+    String errMsg = batchJobService.doScrape(id);
+    if (errMsg == null)
       return new ResponseEntity<>("Batch scrape job " + id + " submitted", HttpStatus.OK);
 
-    // todo make the easier to understand
-    return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(errMsg, HttpStatus.BAD_REQUEST);
   }
 }

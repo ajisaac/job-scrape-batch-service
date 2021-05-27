@@ -19,22 +19,18 @@ import java.util.concurrent.TimeUnit;
 public class MultiPageScrapingExecutor implements ScrapingExecutor {
 
   private final Scraper scraper;
-  private DatabaseService databaseService;
+  private DatabaseService db;
   private WebsocketNotifier notifier;
   private final String name;
-
-  private boolean hasMorePages = true;
-  private int pauseTime = 10;
-  // set this to true to stop the madness
-  private boolean stopScrapingIndicator = false;
+  private static final int PAUSE_TIME = 10;
 
   public MultiPageScrapingExecutor(Scraper scraper) {
     this.scraper = scraper;
     this.name = scraper.getJobSite().name();
   }
 
-  public void setDatabaseService(DatabaseService databaseService) {
-    this.databaseService = databaseService;
+  public void setDb(DatabaseService db) {
+    this.db = db;
   }
 
   @Override
@@ -42,13 +38,10 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
     this.notifier = notifier;
   }
 
-  /**
-   * Scrapes a job site once.
-   */
   public void scrape() {
 
-    while (hasMorePages && !stopScrapingIndicator) {
-      pause(pauseTime);
+    while (true) {
+      pause(PAUSE_TIME);
       // get the page to scrape
       URI uri = scraper.getNextMainPageURI();
       if (uri == null) {
@@ -67,19 +60,21 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
       notifier.foundPostings(jobPostings.size(), this.name, uri.toString());
 
       for (JobPosting jobPosting : jobPostings) {
-        if (jobPosting == null) {
+        if (jobPosting == null)
           continue;
-        }
-        pause(pauseTime);
+
+        pause(PAUSE_TIME);
         notifier.scrapingDescPage(jobPosting.getHref(), this.name);
+
         String jobDescriptionPage = PageGrabber.grabPage(jobPosting.getHref());
         if (jobDescriptionPage == null || jobDescriptionPage.isBlank()) {
           notifier.failedDescPageScrape(jobPosting.getHref(), this.name);
           continue;
         }
+
         scraper.parseJobDescriptionPage(jobDescriptionPage, jobPosting);
 
-        String desc = jobPosting.getDescription();
+        var desc = jobPosting.getDescription();
         if (desc != null) {
           desc = CleanseDescription.cleanse(desc);
           jobPosting.setDescription(desc);
@@ -88,21 +83,16 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
         notifier.successfulDescPageScrape(jobPosting, this.name);
         jobPosting.setJobSite(scraper.getJobSite().name());
         jobPosting.setStatus("new");
-        databaseService.storeJobPostingInDatabase(jobPosting);
+        db.storeJobPostingInDatabase(jobPosting);
       }
     }
   }
 
   @Override
   public void stopScraping() {
-    // will pretty much attempt to stop scraping before and after any
-    // action that might take any amount of time
-    this.stopScrapingIndicator = true;
+    // todo currently not using but want to
   }
 
-  /**
-   * pause for random seconds to simulate being a human
-   */
   private void pause(int maxSeconds) {
     try {
       int r = ThreadLocalRandom.current().nextInt(maxSeconds) + 1;
@@ -113,6 +103,4 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
       e.printStackTrace();
     }
   }
-
-
 }

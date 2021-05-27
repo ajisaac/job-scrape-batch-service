@@ -33,8 +33,8 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
   }
 
   @Override
-  public void setDatabaseService(DatabaseService databaseService) {
-    this.databaseService = databaseService;
+  public void setDb(DatabaseService db) {
+    this.databaseService = db;
   }
 
   @Override

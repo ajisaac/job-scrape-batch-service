@@ -6,7 +6,7 @@ import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 /** This will take a scraper and execute it */
 public interface ScrapingExecutor {
   /** whatever we scrape will probably need to be put into the database */
-  void setDatabaseService(DatabaseService databaseService);
+  void setDb(DatabaseService db);
 
   /** sets the messaging system for this scraper */
   void setWebsocketNotifier(WebsocketNotifier notifier);
