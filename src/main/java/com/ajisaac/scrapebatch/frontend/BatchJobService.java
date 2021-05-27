@@ -6,7 +6,7 @@ import com.ajisaac.scrapebatch.dto.Link;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import com.ajisaac.scrapebatch.scrape.ScrapingExecutor;
+import com.ajisaac.scrapebatch.scrape.executors.ScrapingExecutor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class BatchJobService {
     if (s.isEmpty()) {
       return false;
     }
-    ScrapingExecutorType type = ScrapingExecutorType.getTypeFromScrapeJob(s.get());
+    var type = ScrapingExecutorType.getTypeFromScrapeJob(s.get());
     ImmutableList<ScrapingExecutorType> jobs = ImmutableList.copyOf(this.jobsInProgress);
 
     for (ScrapingExecutorType j : jobs) {
@@ -57,38 +57,30 @@ public class BatchJobService {
     return false;
   }
 
-  /**
-   * Tells us to start scraping this job site.
-   *
-   * @param idNum The id of the batch job.
-   */
-  public String doScrape(long idNum) {
+  public String doScrape(long id) {
 
     // we're given this isNum, which relates to a particular batch job
-    Optional<ScrapeJob> scrapeJob = databaseService.getScrapeJobById(idNum);
-    if (scrapeJob.isEmpty()) {
+    Optional<ScrapeJob> scrapeJob = databaseService.getScrapeJobById(id);
+    if (scrapeJob.isEmpty())
       return "Job Not Found";
-    }
 
     // get the scraping executor type
-    ScrapingExecutorType executorType = ScrapingExecutorType.getTypeFromScrapeJob(scrapeJob.get());
-    if (executorType == null) {
+    var executorType = ScrapingExecutorType.getTypeFromScrapeJob(scrapeJob.get());
+    if (executorType == null)
       return "Job Site Not Found";
-    }
 
     // check if we are already executing this job
     ImmutableList<ScrapingExecutorType> types = ImmutableList.copyOf(this.jobsInProgress);
-    for (ScrapingExecutorType type : types) {
-      if (executorType.equals(type)) {
+    for (ScrapingExecutorType type : types)
+      if (executorType.equals(type))
         return "Already Scraping this Site";
-      }
-    }
+
 
     // get us an executor for this job site
     ScrapingExecutor executor = ScrapingExecutorType.getInstance(scrapeJob.get());
-    if (executor == null) {
+    if (executor == null)
       return "Executor Not Available";
-    }
+
     executor.setDatabaseService(databaseService);
     executor.setWebsocketNotifier(notifier);
 
@@ -125,12 +117,12 @@ public class BatchJobService {
    * create a bunch of scrapeJobs
    */
   public List<ScrapeJob> createScrapeJobs(List<ScrapeJob> scrapeJobs) {
-    if (scrapeJobs == null || scrapeJobs.isEmpty()) {
+    if (scrapeJobs == null || scrapeJobs.isEmpty())
       return new ArrayList<>();
-    }
 
     List<ScrapeJob> existingJobs = getAllScrapeJobs();
     List<ScrapeJob> createdJobs = new ArrayList<>();
+
     for (ScrapeJob sj : scrapeJobs) {
       Optional<ScrapeJob> esj = findScrapeJobIfExists(sj, existingJobs);
       if (esj.isPresent()) {
@@ -140,12 +132,10 @@ public class BatchJobService {
         createdJobs.add(sj);
       }
     }
+
     return createdJobs;
   }
 
-  /**
-   * create a single scrapeJob
-   */
   public ScrapeJob createScrapeJob(ScrapeJob scrapeJob) {
     checkNotNull(scrapeJob);
 
@@ -159,17 +149,12 @@ public class BatchJobService {
     return scrapeJob;
   }
 
-  /**
-   * if the scrapeJob exists in existingJobs, return the version from existingJobs
-   */
-  private Optional<ScrapeJob> findScrapeJobIfExists(
-    ScrapeJob scrapeJob, List<ScrapeJob> existingJobs) {
+  private Optional<ScrapeJob> findScrapeJobIfExists(ScrapeJob scrapeJob, List<ScrapeJob> existingJobs) {
 
-    for (ScrapeJob ej : existingJobs) {
-      if (ej.weakEquals(scrapeJob)) {
+    for (ScrapeJob ej : existingJobs)
+      if (ej.weakEquals(scrapeJob))
         return Optional.of(ej);
-      }
-    }
+
     return Optional.empty();
   }
 
@@ -177,18 +162,4 @@ public class BatchJobService {
     return databaseService.getAllScrapeJobs();
   }
 
-  /**
-   * given a link, try to scrape that job posting
-   */
-  public Optional<JobPosting> scrapeSingleJobLink(Link link) {
-    // determine job site type
-    ScrapingExecutorType type = ScrapingExecutorType.determineSiteFromUrl(link);
-    if (type == null) {
-      return Optional.empty();
-    }
-
-    // submit link to be scraped
-
-    return Optional.empty();
-  }
 }

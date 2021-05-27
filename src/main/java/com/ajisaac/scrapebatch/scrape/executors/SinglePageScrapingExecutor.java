@@ -5,8 +5,7 @@ import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.network.PageGrabber;
 import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.CleanseDescription;
-import com.ajisaac.scrapebatch.scrape.Scraper;
-import com.ajisaac.scrapebatch.scrape.ScrapingExecutor;
+import com.ajisaac.scrapebatch.scrape.scrapers.Scraper;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

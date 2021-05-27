@@ -3,6 +3,7 @@ package com.ajisaac.scrapebatch.scrape;
 import com.ajisaac.scrapebatch.dto.Link;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.executors.MultiPageScrapingExecutor;
+import com.ajisaac.scrapebatch.scrape.executors.ScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.executors.SinglePageScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.scrapers.*;
 

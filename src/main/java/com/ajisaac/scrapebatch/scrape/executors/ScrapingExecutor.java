@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch.scrape;
+package com.ajisaac.scrapebatch.scrape.executors;
 
 import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.network.WebsocketNotifier;
