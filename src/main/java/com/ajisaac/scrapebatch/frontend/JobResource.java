@@ -34,6 +34,13 @@ public class JobResource {
     return new ResponseEntity<>(companies, HttpStatus.OK);
   }
 
+  @PostMapping("/new/angelco")
+  public ResponseEntity<Companies> addAngelCoJobPosting(@RequestBody JobPosting posting){
+    jobService.addAngelCoJobPosting(posting);
+    Companies companies = jobService.getAllJobsByCompany();
+    return new ResponseEntity<>(companies, HttpStatus.OK);
+  }
+
   @PutMapping("/status/{id}/{status}")
   public ResponseEntity updateJobStatus(
     @PathVariable("id")
@@ -76,4 +83,5 @@ public class JobResource {
     List<String> blacklistedCompanies = jobService.getBlacklistedCompanies();
     return new ResponseEntity<>(blacklistedCompanies, HttpStatus.OK);
   }
+
 }

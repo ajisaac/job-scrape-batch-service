@@ -107,4 +107,8 @@ public final class DatabaseService {
   public List<ScrapeJob> getAllScrapeJobs() {
     return scrapeJobRepository.findAll();
   }
+
+  public List<JobPosting> getJobByHref(String href) {
+    return jobPostingRepository.findAllByHref(href);
+  }
 }

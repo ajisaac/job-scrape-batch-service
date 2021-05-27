@@ -108,4 +108,39 @@ public class JobService {
   public void deleteBlacklistedCompany(BlacklistedCompany blc) {
     databaseService.removeBlacklistedCompany(blc);
   }
+
+  public void addAngelCoJobPosting(JobPosting posting) {
+    // do some validation on the body for sanity
+    if (Strings.nullToEmpty(posting.getHref()).isBlank()) {
+      return;
+    }
+
+    var location = posting.getLocation();
+    if(!Strings.nullToEmpty(location).isBlank()){
+      location = addDashes(location);
+      posting.setLocation(location);
+    }
+
+    var tags = posting.getTags();
+    if(!Strings.nullToEmpty(tags).isBlank()){
+      tags = addDashes(tags);
+      posting.setTags(tags);
+    }
+
+    var remote = posting.getRemoteText();
+    if(!Strings.nullToEmpty(remote).isBlank()){
+      remote = addDashes(remote);
+      posting.setRemoteText(remote);
+    }
+
+    List<JobPosting> dupeJobs = databaseService.getJobByHref(posting.getHref());
+    if(dupeJobs.isEmpty()){
+      databaseService.storeJobPostingInDatabase(posting);
+    }
+  }
+
+  // todo not sure if needed
+  private String addDashes(String location) {
+    return location;
+  }
 }
