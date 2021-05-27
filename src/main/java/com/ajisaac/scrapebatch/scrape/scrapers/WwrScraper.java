@@ -2,8 +2,9 @@ package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import com.ajisaac.scrapebatch.scrape.SinglePageScraper;
+import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Attributes;
@@ -11,10 +12,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WwrScraper implements SinglePageScraper {
+public class WwrScraper implements Scraper {
 
   private final String WwrHref = "https://weworkremotely.com/categories/remote-programming-jobs";
 
@@ -150,5 +153,18 @@ public class WwrScraper implements SinglePageScraper {
 
   public String getMainPageHref() {
     return WwrHref;
+  }
+
+  public URI getNextMainPageURI() {
+    var uriBuilder = new URIBuilder();
+    try {
+      // default values
+      uriBuilder.setScheme("https");
+      uriBuilder.setHost("weworkremotely.com");
+      uriBuilder.setPath("categories/remote-programming-jobs");
+      return uriBuilder.build();
+    } catch (URISyntaxException e) {
+      return null;
+    }
   }
 }

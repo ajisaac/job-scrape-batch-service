@@ -30,15 +30,19 @@ public class JobResource {
 
   @GetMapping("/all/bycompany")
   public ResponseEntity<Companies> getAllJobsByCompany() {
-    Companies companies = jobService.getAllJobsByCompany();
+    var companies = jobService.getAllJobsByCompany();
     return new ResponseEntity<>(companies, HttpStatus.OK);
   }
 
+  @GetMapping("/backup")
+  public ResponseEntity<Companies> backup() {
+    return getAllJobsByCompany();
+  }
+
   @PostMapping("/new/angelco")
-  public ResponseEntity<Companies> addAngelCoJobPosting(@RequestBody JobPosting posting){
+  public ResponseEntity<Companies> addAngelCoJobPosting(@RequestBody JobPosting posting) {
     jobService.addAngelCoJobPosting(posting);
-    Companies companies = jobService.getAllJobsByCompany();
-    return new ResponseEntity<>(companies, HttpStatus.OK);
+    return getAllJobsByCompany();
   }
 
   @PutMapping("/status/{id}/{status}")
@@ -63,6 +67,7 @@ public class JobResource {
     List<JobPosting> jobPostings = jobService.updateMultipleJobStatuses(jobStatuses, status);
     return new ResponseEntity<>(jobPostings, HttpStatus.OK);
   }
+
 
   @GetMapping("/blacklistedcompanies")
   public ResponseEntity<List<String>> getBlacklistedCompanies() {

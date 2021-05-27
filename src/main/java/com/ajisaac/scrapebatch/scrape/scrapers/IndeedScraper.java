@@ -2,7 +2,7 @@ package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
-import com.ajisaac.scrapebatch.scrape.MultiPageScraper;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.util.Strings;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class IndeedScraper implements MultiPageScraper {
+public class IndeedScraper implements Scraper {
 
   // Used for keeping track of "next page". We scrape 10 results per page generally.
   private int start = 0;

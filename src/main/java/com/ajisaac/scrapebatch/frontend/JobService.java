@@ -10,52 +10,42 @@ import java.util.*;
 @Service
 public class JobService {
 
-  private final DatabaseService databaseService;
+  private final DatabaseService dbService;
 
   @Autowired
-  public JobService(DatabaseService databaseService) {
-    this.databaseService = databaseService;
+  public JobService(DatabaseService dbService) {
+    this.dbService = dbService;
 
   }
 
-  /**
-   * Gets all the jobs.
-   *
-   * @return all the jobs.
-   */
   public List<JobPosting> getAllJobs() {
-    return databaseService.getAllJobPostings();
+    return dbService.getAllJobPostings();
   }
 
-  /**
-   * Gets all the jobs, but contained within a Company pojo as a list.
-   *
-   * @return All the companies or an empty list.
-   */
   public Companies getAllJobsByCompany() {
-    List<JobPosting> jobPostings = databaseService.getAllJobPostings();
-    Map<String, List<JobPosting>> companyMap = new HashMap<>();
+    List<JobPosting> jobPostings = dbService.getAllJobPostings();
+    Map<String, List<JobPosting>> cMap = new HashMap<>();
 
     // sort by company
     for (JobPosting job : jobPostings) {
-      String company = Strings.nullToEmpty(job.getCompany());
+      var company = Strings.nullToEmpty(job.getCompany());
       if (company.isBlank()) {
         company = "unknown";
       }
-      if (companyMap.containsKey(company)) {
-        companyMap.get(company).add(job);
+      if (cMap.containsKey(company)) {
+        cMap.get(company).add(job);
       } else {
         List<JobPosting> list = new ArrayList<>();
         list.add(job);
-        companyMap.put(company, list);
+        cMap.put(company, list);
       }
     }
 
     // map the map to list of companies
     long id = 1;
-    Companies companies = new Companies();
-    for (Map.Entry<String, List<JobPosting>> entrySet : companyMap.entrySet()) {
-      Company company = new Company(id++, entrySet.getKey(), entrySet.getValue());
+    var companies = new Companies();
+    for (Map.Entry<String, List<JobPosting>> es : cMap.entrySet()) {
+      var company = new Company(id++, es.getKey(), es.getValue());
       companies.addCompany(company);
     }
 
@@ -66,47 +56,41 @@ public class JobService {
    * update the given job with a new status
    */
   public JobPosting updateJobStatus(Long id, String status) {
-    Status s = Status.getStatusByName(status);
+    var s = Status.getStatusByName(status);
     if (s == null) {
       return null;
     }
-    Optional<JobPosting> optionalJobStatus = databaseService.getJobById(id);
+    Optional<JobPosting> optionalJobStatus = dbService.getJobById(id);
     if (optionalJobStatus.isEmpty()) {
       return null;
     }
-    JobPosting jobPosting = optionalJobStatus.get();
+    var jobPosting = optionalJobStatus.get();
     jobPosting.setStatus(s.getLowercase());
-    jobPosting = databaseService.updateJobPosting(jobPosting);
+    jobPosting = dbService.updateJobPosting(jobPosting);
     return jobPosting;
   }
 
-  /**
-   * Update multiple jobs with the status specified
-   */
-  public List<JobPosting> updateMultipleJobStatuses(List<Long> jobStatuses, String status) {
+  public List<JobPosting> updateMultipleJobStatuses(List<Long> ids, String status) {
     List<JobPosting> jobPostings = new ArrayList<>();
-    for (Long id : jobStatuses) {
-      JobPosting jobPosting = updateJobStatus(id, status);
-      if (jobPosting != null) {
-        jobPostings.add(jobPosting);
+    for (Long id : ids) {
+      var jp = updateJobStatus(id, status);
+      if (jp != null) {
+        jobPostings.add(jp);
       }
     }
     return jobPostings;
   }
 
-  /**
-   * Get all the blacklisted companies
-   */
   public List<String> getBlacklistedCompanies() {
-    return databaseService.getAllBlacklistedCompanies();
+    return dbService.getAllBlacklistedCompanies();
   }
 
   public BlacklistedCompany addBlacklistedCompany(BlacklistedCompany blc) {
-    return databaseService.addBlacklistedCompany(blc);
+    return dbService.addBlacklistedCompany(blc);
   }
 
   public void deleteBlacklistedCompany(BlacklistedCompany blc) {
-    databaseService.removeBlacklistedCompany(blc);
+    dbService.removeBlacklistedCompany(blc);
   }
 
   public void addAngelCoJobPosting(JobPosting posting) {
@@ -116,26 +100,26 @@ public class JobService {
     }
 
     var location = posting.getLocation();
-    if(!Strings.nullToEmpty(location).isBlank()){
+    if (!Strings.nullToEmpty(location).isBlank()) {
       location = addDashes(location);
       posting.setLocation(location);
     }
 
     var tags = posting.getTags();
-    if(!Strings.nullToEmpty(tags).isBlank()){
+    if (!Strings.nullToEmpty(tags).isBlank()) {
       tags = addDashes(tags);
       posting.setTags(tags);
     }
 
     var remote = posting.getRemoteText();
-    if(!Strings.nullToEmpty(remote).isBlank()){
+    if (!Strings.nullToEmpty(remote).isBlank()) {
       remote = addDashes(remote);
       posting.setRemoteText(remote);
     }
 
-    List<JobPosting> dupeJobs = databaseService.getJobByHref(posting.getHref());
-    if(dupeJobs.isEmpty()){
-      databaseService.storeJobPostingInDatabase(posting);
+    List<JobPosting> dupeJobs = dbService.getJobByHref(posting.getHref());
+    if (dupeJobs.isEmpty()) {
+      dbService.storeJobPostingInDatabase(posting);
     }
   }
 

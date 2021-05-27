@@ -2,16 +2,19 @@ package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import com.ajisaac.scrapebatch.scrape.SinglePageScraper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.utils.URIBuilder;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkingNomadsScraper implements SinglePageScraper {
+public class WorkingNomadsScraper implements Scraper {
   private final ScrapeJob scrapeJob;
 
   public WorkingNomadsScraper(ScrapeJob scrapeJob) {
@@ -112,5 +115,17 @@ public class WorkingNomadsScraper implements SinglePageScraper {
 
   public String getMainPageHref() {
     return "https://www.workingnomads.co/api/exposed_jobs/";
+  }
+  public URI getNextMainPageURI() {
+    var uriBuilder = new URIBuilder();
+    try {
+      // default values
+      uriBuilder.setScheme("https");
+      uriBuilder.setHost("www.workingnomads.co");
+      uriBuilder.setPath("api/exposed_jobs/");
+      return uriBuilder.build();
+    } catch (URISyntaxException e) {
+      return null;
+    }
   }
 }

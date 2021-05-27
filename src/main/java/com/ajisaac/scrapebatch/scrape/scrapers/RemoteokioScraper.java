@@ -2,19 +2,22 @@ package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import com.ajisaac.scrapebatch.scrape.SinglePageScraper;
+import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class RemoteokioScraper implements SinglePageScraper {
+public class RemoteokioScraper implements Scraper {
   private final String remoteokioUrl = "https://remoteok.io/remote-dev-jobs";
 
   private final ScrapeJob scrapeJob;
@@ -160,5 +163,18 @@ public class RemoteokioScraper implements SinglePageScraper {
 
   public String getMainPageHref() {
     return remoteokioUrl;
+  }
+
+  public URI getNextMainPageURI() {
+    var uriBuilder = new URIBuilder();
+    try {
+      // default values
+      uriBuilder.setScheme("https");
+      uriBuilder.setHost("remoteok.io");
+      uriBuilder.setPath("remote-dev-jobs");
+      return uriBuilder.build();
+    } catch (URISyntaxException e) {
+      return null;
+    }
   }
 }

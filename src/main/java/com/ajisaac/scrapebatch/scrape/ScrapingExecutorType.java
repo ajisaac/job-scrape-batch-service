@@ -69,31 +69,31 @@ public enum ScrapingExecutorType {
         return new MultiPageScrapingExecutor(indeedScraper);
       }
       case WWR -> {
-        SinglePageScraper wwrScraper = new WwrScraper(scrapeJob);
+        Scraper wwrScraper = new WwrScraper(scrapeJob);
         return new SinglePageScrapingExecutor(wwrScraper);
       }
       case REMOTIVEIO -> {
-        SinglePageScraper remoteivioScraper = new RemoteivioScraper(scrapeJob);
+        Scraper remoteivioScraper = new RemoteivioScraper(scrapeJob);
         return new SinglePageScrapingExecutor(remoteivioScraper);
       }
       case REMOTECO -> {
-        SinglePageScraper remotecoScraper = new RemotecoScraper(scrapeJob);
+        Scraper remotecoScraper = new RemotecoScraper(scrapeJob);
         return new SinglePageScrapingExecutor(remotecoScraper);
       }
       case REMOTEOKIO -> {
-        SinglePageScraper remoteokioScraper = new RemoteokioScraper(scrapeJob);
+        Scraper remoteokioScraper = new RemoteokioScraper(scrapeJob);
         return new SinglePageScrapingExecutor(remoteokioScraper);
       }
       case SITEPOINT -> {
-        MultiPageScraper sitepointScraper = new SitepointScraper(scrapeJob);
+        Scraper sitepointScraper = new SitepointScraper(scrapeJob);
         return new MultiPageScrapingExecutor(sitepointScraper);
       }
       case STACKOVERFLOW -> {
-        MultiPageScraper stackoverflowScraper = new StackoverflowScraper(scrapeJob);
+        Scraper stackoverflowScraper = new StackoverflowScraper(scrapeJob);
         return new MultiPageScrapingExecutor(stackoverflowScraper);
       }
       case WORKINGNOMADS -> {
-        SinglePageScraper workingnomadsScraper = new WorkingNomadsScraper(scrapeJob);
+        Scraper workingnomadsScraper = new WorkingNomadsScraper(scrapeJob);
         return new SinglePageScrapingExecutor(workingnomadsScraper);
       }
     }

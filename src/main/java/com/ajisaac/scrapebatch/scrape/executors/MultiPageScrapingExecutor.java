@@ -5,7 +5,7 @@ import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.network.PageGrabber;
 import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.CleanseDescription;
-import com.ajisaac.scrapebatch.scrape.MultiPageScraper;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutor;
 
 import java.net.URI;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MultiPageScrapingExecutor implements ScrapingExecutor {
 
-  private final MultiPageScraper scraper;
+  private final Scraper scraper;
   private DatabaseService databaseService;
   private WebsocketNotifier notifier;
   private final String name;
@@ -29,7 +29,7 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
   // set this to true to stop the madness
   private boolean stopScrapingIndicator = false;
 
-  public MultiPageScrapingExecutor(MultiPageScraper scraper) {
+  public MultiPageScrapingExecutor(Scraper scraper) {
     this.scraper = scraper;
     this.name = scraper.getJobSite().name();
   }

@@ -2,7 +2,7 @@ package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
-import com.ajisaac.scrapebatch.scrape.MultiPageScraper;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,12 +18,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SitepointScraper implements MultiPageScraper {
+public class SitepointScraper implements Scraper {
   private int start = 1;
 
   private boolean shouldKeepScraping = true;
 
   private final ScrapeJob scapeJob;
+
   public SitepointScraper(ScrapeJob scrapeJob) {
     this.scapeJob = scrapeJob;
 

@@ -2,21 +2,24 @@ package com.ajisaac.scrapebatch.scrape.scrapers;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import com.ajisaac.scrapebatch.scrape.SinglePageScraper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteivioScraper implements SinglePageScraper {
+public class RemoteivioScraper implements Scraper {
   private final String remotiveioUrl = "https://remotive.io/remote-jobs/software-dev";
 
   private final ScrapeJob scrapeJob;
@@ -235,5 +238,18 @@ public class RemoteivioScraper implements SinglePageScraper {
 
   public void setScrapeJob(ScrapeJob scrapeJob) {
     // no current need, do we need this?
+  }
+
+  public URI getNextMainPageURI() {
+    var uriBuilder = new URIBuilder();
+    try {
+      // default values
+      uriBuilder.setScheme("https");
+      uriBuilder.setHost("remotive.io");
+      uriBuilder.setPath("remote-jobs/software-dev");
+      return uriBuilder.build();
+    } catch (URISyntaxException e) {
+      return null;
+    }
   }
 }

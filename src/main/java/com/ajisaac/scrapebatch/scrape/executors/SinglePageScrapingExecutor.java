@@ -5,8 +5,8 @@ import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.network.PageGrabber;
 import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.CleanseDescription;
+import com.ajisaac.scrapebatch.scrape.Scraper;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutor;
-import com.ajisaac.scrapebatch.scrape.SinglePageScraper;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,12 +18,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class SinglePageScrapingExecutor implements ScrapingExecutor {
 
-  private final SinglePageScraper scraper;
+  private final Scraper scraper;
   private final String name;
   private DatabaseService databaseService;
   private WebsocketNotifier notifier;
 
-  public SinglePageScrapingExecutor(SinglePageScraper scraper) {
+  public SinglePageScrapingExecutor(Scraper scraper) {
     this.scraper = scraper;
     this.name = scraper.getJobSite().name();
   }
@@ -40,15 +40,15 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
 
   @Override
   public void scrape() {
-    final String href = scraper.getMainPageHref();
+    final var href = scraper.getNextMainPageURI();
     String mainPage = PageGrabber.grabPage(href);
     if (mainPage == null) {
-      notifier.failMainPageScrape(href, this.name);
+      notifier.failMainPageScrape(href.toString(), this.name);
       return;
     }
-    notifier.successfulMainPageScrape(href, this.name);
+    notifier.successfulMainPageScrape(href.toString(), this.name);
     List<JobPosting> jobPostings = scraper.parseMainPage(mainPage);
-    notifier.foundPostings(jobPostings.size(), this.name, href);
+    notifier.foundPostings(jobPostings.size(), this.name, href.toString());
     for (JobPosting jobPosting : jobPostings) {
       if (jobPosting == null) continue;
       if (!jobPosting.isIgnoreScrapeDescriptionPage()) {
