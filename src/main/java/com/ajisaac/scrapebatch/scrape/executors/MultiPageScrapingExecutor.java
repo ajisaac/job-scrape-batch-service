@@ -56,9 +56,6 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
         break;
       }
 
-      if (stopScrapingIndicator) {
-        return;
-      }
       notifier.scrapingMainPage(uri.toString(), this.name);
       String mainPage = PageGrabber.grabPage(uri);
       if (mainPage == null) {
@@ -70,39 +67,18 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
       List<JobPosting> jobPostings = scraper.parseMainPage(mainPage);
       notifier.foundPostings(jobPostings.size(), this.name, uri.toString());
 
-      if (stopScrapingIndicator) {
-        return;
-      }
       for (JobPosting jobPosting : jobPostings) {
         if (jobPosting == null) {
           continue;
         }
-        if (stopScrapingIndicator) {
-          return;
-        }
         pause(pauseTime);
-        if (stopScrapingIndicator) {
-          return;
-        }
         notifier.scrapingDescPage(jobPosting.getHref(), this.name);
-        if (stopScrapingIndicator) {
-          return;
-        }
         String jobDescriptionPage = PageGrabber.grabPage(jobPosting.getHref());
-        if (stopScrapingIndicator) {
-          return;
-        }
         if (jobDescriptionPage == null || jobDescriptionPage.isBlank()) {
           notifier.failedDescPageScrape(jobPosting.getHref(), this.name);
-          if (stopScrapingIndicator) {
-            return;
-          }
           continue;
         }
         scraper.parseJobDescriptionPage(jobDescriptionPage, jobPosting);
-        if (stopScrapingIndicator) {
-          return;
-        }
 
         String desc = jobPosting.getDescription();
         if (desc != null) {
@@ -110,22 +86,10 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
           jobPosting.setDescription(desc);
         }
 
-        if (stopScrapingIndicator) {
-          return;
-        }
         notifier.successfulDescPageScrape(jobPosting, this.name);
-        if (stopScrapingIndicator) {
-          return;
-        }
         jobPosting.setJobSite(scraper.getJobSite().name());
         jobPosting.setStatus("new");
-        if (stopScrapingIndicator) {
-          return;
-        }
         databaseService.storeJobPostingInDatabase(jobPosting);
-        if (stopScrapingIndicator) {
-          return;
-        }
       }
     }
   }

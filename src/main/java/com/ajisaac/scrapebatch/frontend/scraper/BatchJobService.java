@@ -23,12 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Service
 public class BatchJobService {
 
-  // takes our job and stores it in the data store
   DatabaseService databaseService;
-
   WebsocketNotifier notifier;
 
-  // this is how we will keep track of currently scraped jobs
   private List<ScrapingExecutorType> jobsInProgress =
     Collections.synchronizedList(new ArrayList<>());
 
