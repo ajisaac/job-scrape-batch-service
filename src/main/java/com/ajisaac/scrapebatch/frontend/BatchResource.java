@@ -11,12 +11,12 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/batch")
-public class BatchController {
+public class BatchResource {
 
-  private final BatchJobService batchJobService;
+  private final BatchService batchJobService;
 
   @Autowired
-  public BatchController(BatchJobService batchJobService) {
+  public BatchResource(BatchService batchJobService) {
     this.batchJobService = batchJobService;
   }
 

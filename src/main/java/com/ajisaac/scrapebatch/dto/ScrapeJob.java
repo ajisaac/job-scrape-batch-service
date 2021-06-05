@@ -5,6 +5,7 @@ import com.ajisaac.scrapebatch.scrape.executors.MultiPageScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.executors.ScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.executors.SinglePageScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.scrapers.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Entity;
@@ -116,7 +117,7 @@ public class ScrapeJob {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ScrapeJob scrapeJob = (ScrapeJob) o;
+    var scrapeJob = (ScrapeJob) o;
     return id == scrapeJob.id
       && remote == scrapeJob.remote
       && radius == scrapeJob.radius
@@ -133,46 +134,22 @@ public class ScrapeJob {
     return Objects.hash(id, site, name, query, location, remote, radius, jobType, sortType);
   }
 
+  @JsonIgnore
   public ScrapingExecutor getExecutor() {
     ScrapingExecutorType type = getTypeFromScrapeJob();
     if (type == null) {
       return null;
     }
-    switch (type) {
-      case INDEED -> {
-        IndeedScraper indeedScraper = new IndeedScraper(this);
-        return new MultiPageScrapingExecutor(indeedScraper);
-      }
-      case WWR -> {
-        Scraper wwrScraper = new WwrScraper(this);
-        return new SinglePageScrapingExecutor(wwrScraper);
-      }
-      case REMOTIVEIO -> {
-        Scraper remoteivioScraper = new RemoteivioScraper(this);
-        return new SinglePageScrapingExecutor(remoteivioScraper);
-      }
-      case REMOTECO -> {
-        Scraper remotecoScraper = new RemotecoScraper(this);
-        return new SinglePageScrapingExecutor(remotecoScraper);
-      }
-      case REMOTEOKIO -> {
-        Scraper remoteokioScraper = new RemoteokioScraper(this);
-        return new SinglePageScrapingExecutor(remoteokioScraper);
-      }
-      case SITEPOINT -> {
-        Scraper sitepointScraper = new SitepointScraper(this);
-        return new MultiPageScrapingExecutor(sitepointScraper);
-      }
-      case STACKOVERFLOW -> {
-        Scraper stackoverflowScraper = new StackoverflowScraper(this);
-        return new MultiPageScrapingExecutor(stackoverflowScraper);
-      }
-      case WORKINGNOMADS -> {
-        Scraper workingnomadsScraper = new WorkingNomadsScraper(this);
-        return new SinglePageScrapingExecutor(workingnomadsScraper);
-      }
-    }
-    return null;
+    return switch (type) {
+      case INDEED -> new MultiPageScrapingExecutor(new IndeedScraper(this));
+      case WWR -> new SinglePageScrapingExecutor(new WwrScraper(this));
+      case REMOTIVEIO -> new SinglePageScrapingExecutor(new RemoteivioScraper(this));
+      case REMOTECO -> new SinglePageScrapingExecutor(new RemotecoScraper(this));
+      case REMOTEOKIO -> new SinglePageScrapingExecutor(new RemoteokioScraper(this));
+      case SITEPOINT -> new MultiPageScrapingExecutor(new SitepointScraper(this));
+      case STACKOVERFLOW -> new MultiPageScrapingExecutor(new StackoverflowScraper(this));
+      case WORKINGNOMADS -> new SinglePageScrapingExecutor(new WorkingNomadsScraper(this));
+    };
   }
 
   public ScrapingExecutorType getTypeFromScrapeJob() {

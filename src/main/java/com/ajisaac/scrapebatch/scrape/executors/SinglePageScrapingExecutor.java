@@ -45,11 +45,18 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
       notifier.failMainPageScrape(href.toString(), this.name);
       return;
     }
+
     notifier.successfulMainPageScrape(href.toString(), this.name);
     List<JobPosting> jobPostings = scraper.parseMainPage(mainPage);
     notifier.foundPostings(jobPostings.size(), this.name, href.toString());
+
+    jobPostings = scraper.removeJobPostingsBasedOnHref(jobPostings, databaseService);
+    notifier.send("Found " + jobPostings.size() + " non duplicate postings from " + href + " for " + this.name);
+
     for (JobPosting jobPosting : jobPostings) {
-      if (jobPosting == null) continue;
+      if (jobPosting == null)
+        continue;
+
       if (!jobPosting.isIgnoreScrapeDescriptionPage()) {
         pause(10);
         notifier.scrapingDescPage(jobPosting.getHref(), this.name);
@@ -59,13 +66,17 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
           continue;
         }
         scraper.parseJobDescriptionPage(jobDescriptionPage, jobPosting);
+
         notifier.successfulDescPageScrape(jobPosting, this.name);
       }
-      cleanseDescription(jobPosting);
+
+      scraper.cleanseJobDescription(jobPosting);
       jobPosting.setJobSite(this.name);
       jobPosting.setStatus("new");
+
       databaseService.storeJobPostingInDatabase(jobPosting);
     }
+    notifier.send("Finished Scraping WWR.");
   }
 
   @Override

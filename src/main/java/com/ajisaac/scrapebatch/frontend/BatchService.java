@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Service
-public class BatchJobService {
+public class BatchService {
 
   private final DatabaseService db;
   private final WebsocketNotifier notifier;
@@ -26,7 +26,7 @@ public class BatchJobService {
     MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 
   @Autowired
-  public BatchJobService(DatabaseService db, WebsocketNotifier notifier) {
+  public BatchService(DatabaseService db, WebsocketNotifier notifier) {
     this.db = db;
     this.notifier = notifier;
   }

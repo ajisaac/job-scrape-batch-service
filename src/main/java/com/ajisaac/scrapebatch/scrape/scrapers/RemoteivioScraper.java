@@ -1,5 +1,6 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
+import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
@@ -43,7 +44,9 @@ public class RemoteivioScraper implements Scraper {
     return jobPostings;
   }
 
-  /** Parse the basic job that we got from the main page. */
+  /**
+   * Parse the basic job that we got from the main page.
+   */
   private JobPosting parseBasicJobPosting(Element job) {
 
     JobPosting jobPosting = new JobPosting();
@@ -137,7 +140,9 @@ public class RemoteivioScraper implements Scraper {
     return ScrapingExecutorType.REMOTIVEIO;
   }
 
-  /** Tries to get the url, or returns null. */
+  /**
+   * Tries to get the url, or returns null.
+   */
   private String parseHref(Element job) {
     String rel = job.attr("data-url");
     if (rel.isBlank()) {
@@ -147,7 +152,9 @@ public class RemoteivioScraper implements Scraper {
     }
   }
 
-  /** Tries to get the job title or returns "". */
+  /**
+   * Tries to get the job title or returns "".
+   */
   private String parseJobTitle(Element job) {
     Elements positions = job.getElementsByClass("position");
     if (positions.isEmpty()) {
@@ -162,7 +169,9 @@ public class RemoteivioScraper implements Scraper {
     return positionLink.text();
   }
 
-  /** Tries to get the job tags or returns "". */
+  /**
+   * Tries to get the job tags or returns "".
+   */
   private String parseJobTags(Element job) {
     Elements jobTags = job.getElementsByClass("job-tag");
     if (jobTags.isEmpty()) {
@@ -178,7 +187,9 @@ public class RemoteivioScraper implements Scraper {
     return ret.toString().trim();
   }
 
-  /** Tries to get the company name or returns "". */
+  /**
+   * Tries to get the company name or returns "".
+   */
   private String parseCompany(Element job) {
     Elements companies = job.getElementsByClass("company");
     if (companies.isEmpty()) {
@@ -202,7 +213,9 @@ public class RemoteivioScraper implements Scraper {
     }
   }
 
-  /** Tries to get the company location or returns "". */
+  /**
+   * Tries to get the company location or returns "".
+   */
   private String parseLocation(Element job) {
     Elements companies = job.getElementsByClass("company");
     if (companies.isEmpty()) {
@@ -226,10 +239,6 @@ public class RemoteivioScraper implements Scraper {
     }
   }
 
-  public String getMainPageHref() {
-    return remotiveioUrl;
-  }
-
   public JobPosting setJobSite(JobPosting jobPosting) {
     jobPosting.setJobSite(ScrapingExecutorType.REMOTIVEIO.toString());
     return jobPosting;
@@ -250,5 +259,15 @@ public class RemoteivioScraper implements Scraper {
     } catch (URISyntaxException e) {
       return null;
     }
+  }
+
+  @Override
+  public void cleanseJobDescription(JobPosting posting) {
+
+  }
+
+  @Override
+  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
+    return jobPostings;
   }
 }

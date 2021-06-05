@@ -3,9 +3,8 @@ package com.ajisaac.scrapebatch.dto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -13,13 +12,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public final class DatabaseService {
   private final JobPostingRepository jobPostingRepository;
   private final ScrapeJobRepository scrapeJobRepository;
+  private final HighlightWordRepository highlightWordsRepository;
 
   @Autowired
   public DatabaseService(
     JobPostingRepository jobPostingRepository,
-    ScrapeJobRepository scrapeJobRepository) {
+    ScrapeJobRepository scrapeJobRepository,
+    HighlightWordRepository highlightWordsRepository) {
     this.jobPostingRepository = jobPostingRepository;
     this.scrapeJobRepository = scrapeJobRepository;
+    this.highlightWordsRepository = highlightWordsRepository;
   }
 
   public List<JobPosting> getAllJobPostings() {
@@ -59,5 +61,16 @@ public final class DatabaseService {
 
   public List<JobPosting> getJobByHref(String href) {
     return jobPostingRepository.findAllByHref(href);
+  }
+
+  public List<String> getHrefsForSite(String site) {
+    var postings = jobPostingRepository.findAllByJobSite(site);
+    return postings.stream()
+      .map(JobPosting::getHref)
+      .collect(Collectors.toList());
+  }
+
+  public List<HighlightWord> getHighlightWords() {
+    return this.highlightWordsRepository.findAll();
   }
 }

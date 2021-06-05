@@ -1,5 +1,6 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
+import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
@@ -178,5 +179,15 @@ public class StackoverflowScraper implements Scraper {
     } catch (URISyntaxException e) {
       return null;
     }
+  }
+
+  @Override
+  public void cleanseJobDescription(JobPosting posting) {
+
+  }
+
+  @Override
+  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
+    return jobPostings;
   }
 }

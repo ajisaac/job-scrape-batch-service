@@ -1,5 +1,6 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
+import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
@@ -192,10 +193,6 @@ public class RemotecoScraper implements Scraper {
     return firstHalf + secondHalf;
   }
 
-  public String getMainPageHref() {
-    return remotecoUrl;
-  }
-
   public void setScrapeJob(ScrapeJob scrapeJob) {
     // no current need
   }
@@ -216,5 +213,15 @@ public class RemotecoScraper implements Scraper {
     } catch (URISyntaxException e) {
       return null;
     }
+  }
+
+  @Override
+  public void cleanseJobDescription(JobPosting posting) {
+
+  }
+
+  @Override
+  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
+    return jobPostings;
   }
 }

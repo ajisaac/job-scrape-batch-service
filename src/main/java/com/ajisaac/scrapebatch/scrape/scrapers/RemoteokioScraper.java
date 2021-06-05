@@ -1,5 +1,6 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
+import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
@@ -160,10 +161,6 @@ public class RemoteokioScraper implements Scraper {
     // no need currently
   }
 
-  public String getMainPageHref() {
-    return remoteokioUrl;
-  }
-
   public URI getNextMainPageURI() {
     var uriBuilder = new URIBuilder();
     try {
@@ -175,5 +172,15 @@ public class RemoteokioScraper implements Scraper {
     } catch (URISyntaxException e) {
       return null;
     }
+  }
+
+  @Override
+  public void cleanseJobDescription(JobPosting posting) {
+
+  }
+
+  @Override
+  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
+    return jobPostings;
   }
 }
