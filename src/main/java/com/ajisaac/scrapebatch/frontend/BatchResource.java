@@ -5,6 +5,7 @@ import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -14,10 +15,12 @@ import java.util.*;
 public class BatchResource {
 
   private final BatchService batchJobService;
+  private final SimpMessagingTemplate template;
 
   @Autowired
-  public BatchResource(BatchService batchJobService) {
+  public BatchResource(BatchService batchJobService, SimpMessagingTemplate template) {
     this.batchJobService = batchJobService;
+    this.template = template;
   }
 
   // todo fix all this weirdness, return proper responses if failure
@@ -62,5 +65,10 @@ public class BatchResource {
       return new ResponseEntity<>("Batch scrape job " + id + " submitted", HttpStatus.OK);
 
     return new ResponseEntity<>(errMsg, HttpStatus.BAD_REQUEST);
+  }
+
+  @PostMapping("/message")
+  public void addMessage(@RequestBody String msg){
+    template.convertAndSend("/topic/messages", msg);
   }
 }

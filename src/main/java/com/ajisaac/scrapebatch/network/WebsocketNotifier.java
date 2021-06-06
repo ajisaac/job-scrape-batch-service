@@ -1,49 +1,76 @@
 package com.ajisaac.scrapebatch.network;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
+import com.ajisaac.scrapebatch.websocket.MessageService;
+import com.ajisaac.scrapebatch.websocket.dto.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WebsocketNotifier {
+
+  private final MessageService ms;
+
+  public WebsocketNotifier(@Autowired MessageService ms) {
+    this.ms = ms;
+  }
+
   public void send(String message) {
     System.out.println(message);
   }
 
   public void error(Exception e, String siteName) {
-    System.out.println(e.getMessage() + " when scraping " + siteName + ".");
+    var msg = e.getMessage() + " when scraping " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void sleeping(int seconds, String siteName) {
-    System.out.println("Sleeping for " + seconds + " while scraping " + siteName + ".");
+    var msg = "Sleeping for " + seconds + " while scraping " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void successfulDescPageScrape(JobPosting jobPosting, String siteName) {
-    System.out.println(
-      "Successfully scraped " + jobPosting.getJobSite() + " - " + jobPosting.getCompany()
-        + " while scraping " + siteName + ".");
+    var msg = "Successfully scraped " + jobPosting.getJobSite() + " - " + jobPosting.getCompany()
+      + " while scraping " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void failedDescPageScrape(String href, String siteName) {
-    System.out.println("Failed to scrape " + href + " while scraping " + siteName + ".");
+    var msg = "Failed to scrape " + href + " while scraping " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void scrapingDescPage(String href, String siteName) {
-    System.out.println("Scraping " + href + " from " + siteName + ".");
+    var msg = "Scraping " + href + " from " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void scrapingMainPage(String href, String siteName) {
-    System.out.println("Scraping main page " + href + " for " + siteName + ".");
+    var msg = "Scraping main page " + href + " for " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void failMainPageScrape(String href, String siteName) {
-    System.out.println("Failed scraping main page " + href + " for " + siteName + ".");
+    var msg = "Failed scraping main page " + href + " for " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void successfulMainPageScrape(String href, String siteName) {
-    System.out.println("Success scraping main page " + href + " for " + siteName + ".");
+    var msg = "Success scraping main page " + href + " for " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 
   public void foundPostings(int size, String siteName, String href) {
-    System.out.println("Found " + size + " postings from " + href + " for " + siteName + ".");
+    var msg = "Found " + size + " postings from " + href + " for " + siteName + ".";
+    System.out.println(msg);
+    ms.send(new Message(siteName, msg));
   }
 }
