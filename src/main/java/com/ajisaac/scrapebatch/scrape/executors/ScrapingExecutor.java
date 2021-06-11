@@ -14,6 +14,6 @@ public interface ScrapingExecutor {
   /** scrape the scrape job site */
   void scrape();
 
-  /** * stops scraping */
+  /** stops scraping */
   void stopScraping();
 }

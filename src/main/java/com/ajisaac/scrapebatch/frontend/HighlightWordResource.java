@@ -2,41 +2,44 @@ package com.ajisaac.scrapebatch.frontend;
 
 import com.ajisaac.scrapebatch.dto.HighlightWord;
 import com.ajisaac.scrapebatch.dto.HighlightWordRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Locale;
 
-@RestController
-@RequestMapping("/highlight")
+@Path("/highlight")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class HighlightWordResource {
-
 
   private final HighlightWordRepository repository;
 
-  public HighlightWordResource(@Autowired HighlightWordRepository repository) {
+  public HighlightWordResource(HighlightWordRepository repository) {
     this.repository = repository;
   }
 
-  @GetMapping("/all")
-  public ResponseEntity<List<HighlightWord>> getAll() {
-    return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+  @GET
+  @Path("/all")
+  @Transactional
+  public List<HighlightWord> getAll() {
+    return repository.findAll().list();
   }
 
-  @PostMapping("/add")
-  public ResponseEntity<List<HighlightWord>> addWord(@RequestBody HighlightWord word) {
+  @POST
+  @Path("/add")
+  @Transactional
+  public List<HighlightWord> addWord(HighlightWord word) {
     if (word.getName() == null || word.getName().isBlank())
       return getAll();
 
-    var words = repository.findAll();
+    var words = repository.findAll().list();
     for (HighlightWord w : words)
       if (w.getName().toLowerCase(Locale.ROOT).equals(word.getName().toLowerCase(Locale.ROOT)))
         return getAll();
 
-    repository.save(word);
+    repository.persist(word);
     return getAll();
   }
 }

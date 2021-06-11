@@ -13,20 +13,20 @@ public class PageGrabber {
   }
 
   public static String grabPage(URI uri) {
-    if (uri == null) {
+    if (uri == null)
       return null;
-    }
-    String ret = new PageRequest(uri).sendGet();
-    if (ret == null || ret.isBlank()) {
+
+    var ret = new PageRequest(uri).sendGet();
+    if (ret == null || ret.isBlank())
       return null;
-    }
+
     return ret;
   }
 
   public static String grabPage(String href) {
-    if (href == null || href.isBlank()) {
+    if (href == null || href.isBlank())
       return null;
-    }
+
     try {
       var uri = new URI(href);
       return grabPage(uri);

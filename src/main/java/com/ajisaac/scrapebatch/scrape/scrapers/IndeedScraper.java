@@ -4,8 +4,8 @@ import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
+import com.google.common.base.Strings;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,8 +15,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class IndeedScraper implements Scraper {
 
@@ -131,7 +129,7 @@ public class IndeedScraper implements Scraper {
       uriBuilder.addParameter("q", this.scrapeJob.getQuery());
       uriBuilder.addParameter("l", this.scrapeJob.getLocation());
 
-      if (!Strings.isBlank(scrapeJob.getSortType())) {
+      if (!Strings.isNullOrEmpty(scrapeJob.getSortType())) {
         uriBuilder.addParameter("sort", this.scrapeJob.getSortType());
       }
 

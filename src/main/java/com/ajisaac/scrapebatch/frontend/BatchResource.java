@@ -2,22 +2,20 @@ package com.ajisaac.scrapebatch.frontend;
 
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.*;
 
-@RestController
-@RequestMapping("/batch")
+@Path("/batch")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class BatchResource {
 
   private final BatchService batchJobService;
 //  private final SimpMessagingTemplate template;
 
-  @Autowired
   public BatchResource(BatchService batchJobService
 //                       SimpMessagingTemplate template
   ) {
@@ -27,46 +25,52 @@ public class BatchResource {
 
   // todo fix all this weirdness, return proper responses if failure
 
-  @PostMapping("/scrape-job")
-  public ResponseEntity<ScrapeJob> createScrapeJob(@RequestBody ScrapeJob scrapeJob) {
+  @POST
+  @Path("/scrape-job")
+  public Response createScrapeJob(ScrapeJob scrapeJob) {
     scrapeJob = batchJobService.createScrapeJob(scrapeJob);
     if (scrapeJob == null)
-      return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-
-    return new ResponseEntity<>(scrapeJob, HttpStatus.ACCEPTED);
+      return Response.status(400).entity(null).build();
+    return Response.accepted(scrapeJob).build();
   }
 
-  @PostMapping("/scrape-jobs")
-  public ResponseEntity createScrapeJobs(@RequestBody List<ScrapeJob> scrapeJobs) {
+  @POST
+  @Path("/scrape-jobs")
+  public Response createScrapeJobs(List<ScrapeJob> scrapeJobs) {
     List<ScrapeJob> createdJobs = batchJobService.createScrapeJobs(scrapeJobs);
-    return new ResponseEntity(createdJobs, HttpStatus.ACCEPTED);
+    return Response.accepted().entity(createdJobs).build();
   }
 
-  @GetMapping("/scrape-jobs")
-  public ResponseEntity<List<ScrapeJob>> getScrapeJobs() {
-    return new ResponseEntity<>(batchJobService.getAllScrapeJobs(), HttpStatus.OK);
+  @GET
+  @Path("/scrape-jobs")
+  public List<ScrapeJob> getScrapeJobs() {
+    return batchJobService.getAllScrapeJobs();
   }
 
-  @GetMapping("/sites")
-  public ResponseEntity<List<String>> getSites() {
+  @GET
+  @Path("/sites")
+  public List<String> getSites() {
     List<String> sites = new ArrayList<>();
-
     for (ScrapingExecutorType i : ScrapingExecutorType.values())
       sites.add(i.toString());
-
-    return new ResponseEntity<>(sites, HttpStatus.OK);
+    return sites;
   }
 
-  @PostMapping("/scrape/{id}")
-  public ResponseEntity<String> doScrape(@PathVariable Long id) {
+  @POST
+  @Path("/scrape/{id}")
+  public Response doScrape(@PathParam("id") Long id) {
     if (batchJobService.isCurrentlyScraping(id))
-      return new ResponseEntity<>("Already scraping this site.", HttpStatus.OK);
-
+      return Response.ok("Already scraping this site.").build();
     String errMsg = batchJobService.doScrape(id);
     if (errMsg == null)
-      return new ResponseEntity<>("Batch scrape job " + id + " submitted", HttpStatus.OK);
-
-    return new ResponseEntity<>(errMsg, HttpStatus.BAD_REQUEST);
+      return Response.ok("Batch scrape job " + id + " submitted").build();
+    return Response.status(400).entity(errMsg).build();
   }
 
+  @POST
+  @Path("/stop-scrape/{id}")
+  public Response stopScrape(@PathParam("id") Long id) {
+    String msg = batchJobService.stopScraping(id);
+    return Response.status(200).entity(msg).build();
+  }
 }

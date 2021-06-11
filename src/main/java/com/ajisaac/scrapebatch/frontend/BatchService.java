@@ -5,27 +5,22 @@ import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
 import com.ajisaac.scrapebatch.scrape.executors.ScrapingExecutor;
-import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.eclipse.microprofile.context.ManagedExecutor;
 
+import javax.inject.Singleton;
 import java.util.*;
-import java.util.concurrent.Executors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Service
+@Singleton
 public class BatchService {
 
   private final DatabaseService db;
   private final WebsocketNotifier notifier;
-  private final List<ScrapingExecutorType> jobsInProgress =
-    Collections.synchronizedList(new ArrayList<>());
-  private final ListeningExecutorService executorService =
-    MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 
-  @Autowired
+  private final Map<ScrapingExecutorType, ScrapingExecutor> jobsInProgress =
+    Collections.synchronizedMap(new HashMap<>());
+
+  private final ManagedExecutor executorService = ManagedExecutor.builder().build();
+
   public BatchService(DatabaseService db, WebsocketNotifier notifier) {
     this.db = db;
     this.notifier = notifier;
@@ -37,13 +32,26 @@ public class BatchService {
       return false;
 
     var type = scrapeJob.getTypeFromScrapeJob();
-    ImmutableList<ScrapingExecutorType> jobs = ImmutableList.copyOf(this.jobsInProgress);
 
-    for (ScrapingExecutorType j : jobs)
-      if (j == type)
-        return true;
+    return this.jobsInProgress.get(type) != null;
+  }
 
-    return false;
+  public String stopScraping(long id) {
+    var scrapeJob = db.getScrapeJobById(id);
+    if (scrapeJob == null)
+      return "Job Not Found";
+
+    var type = scrapeJob.getTypeFromScrapeJob();
+    if (type == null)
+      return "Job Site Not Found";
+
+    if (this.jobsInProgress.containsKey(type)) {
+      jobsInProgress.get(type).stopScraping();
+      jobsInProgress.remove(type);
+      return "Stopped scraping";
+    }
+    return "Scrape job wasn't in progress";
+
   }
 
   public String doScrape(long id) {
@@ -56,7 +64,7 @@ public class BatchService {
     if (executorType == null)
       return "Job Site Not Found";
 
-    if (alreadyExecuting(executorType))
+    if (this.jobsInProgress.containsKey(executorType))
       return "Already Scraping this Site";
 
     var executor = scrapeJob.getExecutor();
@@ -66,37 +74,19 @@ public class BatchService {
     executor.setDb(db);
     executor.setWebsocketNotifier(notifier);
 
-    jobsInProgress.add(executorType);
-    ListenableFuture<ScrapingExecutor> scrapingExecutorFuture =
-      executorService.submit(
-        () -> {
-          executor.scrape();
-          return executor;
-        });
+    jobsInProgress.put(executorType, executor);
 
-    addCallback(scrapingExecutorFuture, executorType);
+
+    // todo add a hook into the thread that lets us stop its execution
+    executorService.submit(() -> {
+      executor.scrape();
+      jobsInProgress.remove(executorType);
+    });
+
 
     return null;
   }
 
-  private void addCallback(ListenableFuture<ScrapingExecutor> scrapingExecutorFuture,
-                           ScrapingExecutorType executorType) {
-
-    Futures.addCallback(scrapingExecutorFuture,
-      new FutureCallback<>() {
-        @Override
-        public void onSuccess(ScrapingExecutor result) {
-          jobsInProgress.remove(executorType);
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-          jobsInProgress.remove(executorType);
-        }
-      },
-      executorService);
-
-  }
 
   public List<ScrapeJob> createScrapeJobs(List<ScrapeJob> scrapeJobs) {
     if (scrapeJobs == null || scrapeJobs.isEmpty())
@@ -142,15 +132,6 @@ public class BatchService {
 
   public List<ScrapeJob> getAllScrapeJobs() {
     return db.getAllScrapeJobs();
-  }
-
-  private boolean alreadyExecuting(ScrapingExecutorType executorType) {
-    ImmutableList<ScrapingExecutorType> types = ImmutableList.copyOf(this.jobsInProgress);
-    for (ScrapingExecutorType type : types)
-      if (executorType.equals(type))
-        return true;
-
-    return false;
   }
 
 }

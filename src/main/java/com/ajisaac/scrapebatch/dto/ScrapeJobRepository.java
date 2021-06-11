@@ -1,6 +1,10 @@
 package com.ajisaac.scrapebatch.dto;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
 
-public interface ScrapeJobRepository extends JpaRepository<ScrapeJob, Long> {
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class ScrapeJobRepository implements PanacheRepository<ScrapeJob> {
+
 }

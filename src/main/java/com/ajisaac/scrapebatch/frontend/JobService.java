@@ -2,17 +2,15 @@ package com.ajisaac.scrapebatch.frontend;
 
 import com.ajisaac.scrapebatch.dto.*;
 import com.google.common.base.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Singleton;
 import java.util.*;
 
-@Service
+@Singleton
 public class JobService {
 
   private final DatabaseService db;
 
-  @Autowired
   public JobService(DatabaseService db) {
     this.db = db;
 

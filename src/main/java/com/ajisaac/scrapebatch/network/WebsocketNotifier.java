@@ -3,15 +3,15 @@ package com.ajisaac.scrapebatch.network;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.websocket.MessageService;
 import com.ajisaac.scrapebatch.websocket.Message;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
+import javax.inject.Singleton;
+
+@Singleton
 public class WebsocketNotifier {
 
   private final MessageService ms;
 
-  public WebsocketNotifier(@Autowired MessageService ms) {
+  public WebsocketNotifier(MessageService ms) {
     this.ms = ms;
   }
 

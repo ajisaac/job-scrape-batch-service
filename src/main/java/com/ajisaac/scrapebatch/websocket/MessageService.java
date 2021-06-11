@@ -1,10 +1,11 @@
 package com.ajisaac.scrapebatch.websocket;
 
+import javax.inject.Singleton;
+
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
 //
-@Service
+@Singleton
 public class MessageService {
 //
 //  private final SimpMessagingTemplate template;

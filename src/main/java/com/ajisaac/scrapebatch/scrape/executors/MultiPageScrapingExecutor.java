@@ -7,6 +7,7 @@ import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.CleanseDescription;
 import com.ajisaac.scrapebatch.scrape.scrapers.Scraper;
 
+import javax.inject.Inject;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,10 +20,13 @@ import java.util.concurrent.TimeUnit;
 public class MultiPageScrapingExecutor implements ScrapingExecutor {
 
   private final Scraper scraper;
-  private DatabaseService db;
+//  @Inject
+  DatabaseService db;
   private WebsocketNotifier notifier;
   private final String name;
   private static final int PAUSE_TIME = 10;
+
+  private boolean stopped = false;
 
   public MultiPageScrapingExecutor(Scraper scraper) {
     this.scraper = scraper;
@@ -60,6 +64,10 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
       notifier.foundPostings(jobPostings.size(), this.name, uri.toString());
 
       for (JobPosting jobPosting : jobPostings) {
+        if (stopped) {
+          notifier.send("Received signal to stop");
+          return;
+        }
         if (jobPosting == null)
           continue;
 
@@ -89,8 +97,8 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
   }
 
   @Override
-  public void stopScraping() {
-    // todo currently not using but want to
+  public synchronized void stopScraping() {
+    this.stopped = true;
   }
 
   private void pause(int maxSeconds) {

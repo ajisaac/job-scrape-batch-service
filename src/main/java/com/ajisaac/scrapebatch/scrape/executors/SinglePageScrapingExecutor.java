@@ -7,6 +7,7 @@ import com.ajisaac.scrapebatch.network.WebsocketNotifier;
 import com.ajisaac.scrapebatch.scrape.CleanseDescription;
 import com.ajisaac.scrapebatch.scrape.scrapers.Scraper;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -19,8 +20,11 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
 
   private final Scraper scraper;
   private final String name;
-  private DatabaseService databaseService;
+//  @Inject
+  DatabaseService databaseService;
   private WebsocketNotifier notifier;
+
+  private boolean stopped = false;
 
   public SinglePageScrapingExecutor(Scraper scraper) {
     this.scraper = scraper;
@@ -54,6 +58,11 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
     notifier.send("Found " + jobPostings.size() + " non duplicate postings from " + href + " for " + this.name);
 
     for (JobPosting jobPosting : jobPostings) {
+      if (stopped){
+        notifier.send("Received signal to stop");
+        return;
+
+      }
       if (jobPosting == null)
         continue;
 
@@ -80,8 +89,8 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
   }
 
   @Override
-  public void stopScraping() {
-    // currently not implemented
+  public synchronized void stopScraping() {
+    this.stopped = true;
   }
 
   private void cleanseDescription(JobPosting jobPosting) {

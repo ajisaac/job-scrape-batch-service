@@ -41,44 +41,44 @@ public enum ScrapingExecutorType {
    * given the scrapeJob, get an executor for it
    */
   public static ScrapingExecutor getInstance(ScrapeJob scrapeJob) {
-    ScrapingExecutorType type = getTypeFromScrapeJob(scrapeJob);
-    if (type == null) {
-      return null;
-    }
-    switch (type) {
-      case INDEED -> {
-        IndeedScraper indeedScraper = new IndeedScraper(scrapeJob);
-        return new MultiPageScrapingExecutor(indeedScraper);
-      }
-      case WWR -> {
-        Scraper wwrScraper = new WwrScraper(scrapeJob);
-        return new SinglePageScrapingExecutor(wwrScraper);
-      }
-      case REMOTIVEIO -> {
-        Scraper remoteivioScraper = new RemoteivioScraper(scrapeJob);
-        return new SinglePageScrapingExecutor(remoteivioScraper);
-      }
-      case REMOTECO -> {
-        Scraper remotecoScraper = new RemotecoScraper(scrapeJob);
-        return new SinglePageScrapingExecutor(remotecoScraper);
-      }
-      case REMOTEOKIO -> {
-        Scraper remoteokioScraper = new RemoteokioScraper(scrapeJob);
-        return new SinglePageScrapingExecutor(remoteokioScraper);
-      }
-      case SITEPOINT -> {
-        Scraper sitepointScraper = new SitepointScraper(scrapeJob);
-        return new MultiPageScrapingExecutor(sitepointScraper);
-      }
-      case STACKOVERFLOW -> {
-        Scraper stackoverflowScraper = new StackoverflowScraper(scrapeJob);
-        return new MultiPageScrapingExecutor(stackoverflowScraper);
-      }
-      case WORKINGNOMADS -> {
-        Scraper workingnomadsScraper = new WorkingNomadsScraper(scrapeJob);
-        return new SinglePageScrapingExecutor(workingnomadsScraper);
-      }
-    }
+//    ScrapingExecutorType type = getTypeFromScrapeJob(scrapeJob);
+//    if (type == null) {
+//      return null;
+//    }
+//    switch (type) {
+//      case INDEED -> {
+//        IndeedScraper indeedScraper = new IndeedScraper(scrapeJob);
+//        return new MultiPageScrapingExecutor(indeedScraper);
+//      }
+//      case WWR -> {
+//        Scraper wwrScraper = new WwrScraper(scrapeJob);
+//        return new SinglePageScrapingExecutor(wwrScraper);
+//      }
+//      case REMOTIVEIO -> {
+//        Scraper remoteivioScraper = new RemoteivioScraper(scrapeJob);
+//        return new SinglePageScrapingExecutor(remoteivioScraper);
+//      }
+//      case REMOTECO -> {
+//        Scraper remotecoScraper = new RemotecoScraper(scrapeJob);
+//        return new SinglePageScrapingExecutor(remotecoScraper);
+//      }
+//      case REMOTEOKIO -> {
+//        Scraper remoteokioScraper = new RemoteokioScraper(scrapeJob);
+//        return new SinglePageScrapingExecutor(remoteokioScraper);
+//      }
+//      case SITEPOINT -> {
+//        Scraper sitepointScraper = new SitepointScraper(scrapeJob);
+//        return new MultiPageScrapingExecutor(sitepointScraper);
+//      }
+//      case STACKOVERFLOW -> {
+//        Scraper stackoverflowScraper = new StackoverflowScraper(scrapeJob);
+//        return new MultiPageScrapingExecutor(stackoverflowScraper);
+//      }
+//      case WORKINGNOMADS -> {
+//        Scraper workingnomadsScraper = new WorkingNomadsScraper(scrapeJob);
+//        return new SinglePageScrapingExecutor(workingnomadsScraper);
+//      }
+//    }
     return null;
   }
 }

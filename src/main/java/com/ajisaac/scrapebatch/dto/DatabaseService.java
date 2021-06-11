@@ -1,20 +1,18 @@
 package com.ajisaac.scrapebatch.dto;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Service
-public final class DatabaseService {
+//@Singleton
+@ApplicationScoped
+public class DatabaseService {
   private final JobPostingRepository jobPostingRepository;
   private final ScrapeJobRepository scrapeJobRepository;
   private final HighlightWordRepository highlightWordsRepository;
 
-  @Autowired
   public DatabaseService(
     JobPostingRepository jobPostingRepository,
     ScrapeJobRepository scrapeJobRepository,
@@ -25,38 +23,39 @@ public final class DatabaseService {
   }
 
   public List<JobPosting> getAllJobPostings() {
-    return jobPostingRepository.findAll();
+    return jobPostingRepository.findAll().list();
   }
 
   public JobPosting getJobById(Long id) {
-    return jobPostingRepository.findById(id).orElse(null);
+    return jobPostingRepository.findById(id);
   }
 
+  @Transactional
   public JobPosting updateJobPosting(JobPosting jp) {
-    if (jp == null)
-      return null;
-    return jobPostingRepository.save(jp);
+    if (jp != null)
+      jobPostingRepository.persist(jp);
+    return jp;
   }
 
-
+  @Transactional
   public void storeJobPostingInDatabase(JobPosting jp) {
-    if (jp == null)
-      return;
-    jobPostingRepository.save(jp);
+    if (jp != null)
+      jobPostingRepository.persist(jp);
   }
 
+  @Transactional
   public ScrapeJob storeScrapeJobInDatabase(ScrapeJob sj) {
-    if (sj == null)
-      return null;
-    return scrapeJobRepository.save(sj);
+    if (sj != null)
+      scrapeJobRepository.persist(sj);
+    return sj;
   }
 
   public ScrapeJob getScrapeJobById(long idNum) {
-    return scrapeJobRepository.findById(idNum).orElse(null);
+    return scrapeJobRepository.findById(idNum);
   }
 
   public List<ScrapeJob> getAllScrapeJobs() {
-    return scrapeJobRepository.findAll();
+    return scrapeJobRepository.findAll().list();
   }
 
   public List<JobPosting> getJobByHref(String href) {
@@ -71,6 +70,6 @@ public final class DatabaseService {
   }
 
   public List<HighlightWord> getHighlightWords() {
-    return this.highlightWordsRepository.findAll();
+    return this.highlightWordsRepository.findAll().list();
   }
 }

@@ -1,61 +1,63 @@
 package com.ajisaac.scrapebatch.frontend;
 
 import com.ajisaac.scrapebatch.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 // todo add validations
-@RestController
-@RequestMapping("/jobs")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+@Path("/jobs")
 public class JobResource {
   private final JobService jobService;
 
-  @Autowired
   public JobResource(JobService jobService) {
     this.jobService = jobService;
   }
 
-  @GetMapping("/all")
-  public ResponseEntity<List<JobPosting>> getAllJobs() {
-    List<JobPosting> jobs = jobService.getAllJobs();
-    return new ResponseEntity<>(jobs, HttpStatus.OK);
+  @GET
+  @Path("/all")
+  public List<JobPosting> getAllJobs() {
+    return jobService.getAllJobs();
   }
 
-  @GetMapping("/all/bycompany")
-  public ResponseEntity<Companies> getAllJobsByCompany() {
-    var companies = jobService.getAllJobsByCompany();
-    return new ResponseEntity<>(companies, HttpStatus.OK);
+  @GET
+  @Path("/all/bycompany")
+  public Companies getAllJobsByCompany() {
+    return jobService.getAllJobsByCompany();
   }
 
-  @GetMapping("/backup")
-  public ResponseEntity<Companies> backup() {
+  @GET
+  @Path("/backup")
+  public Companies backup() {
     return getAllJobsByCompany();
   }
 
-  @PostMapping("/new/angelco")
-  public ResponseEntity<Companies> addAngelCoJobPosting(@RequestBody JobPosting posting) {
+  @POST
+  @Path("/new/angelco")
+  public Companies addAngelCoJobPosting(JobPosting posting) {
     jobService.addAngelCoJobPosting(posting);
     return getAllJobsByCompany();
   }
 
-  @PutMapping("/status/{id}/{status}")
-  public ResponseEntity updateJobStatus(@PathVariable("id") Long id,
-                                        @PathVariable("status") String status) {
+  @PUT
+  @Path("/status/{id}/{status}")
+  public Response updateJobStatus(@PathParam("id") Long id,
+                                  @PathParam("status") String status) {
     var jobPosting = jobService.updateJobStatus(id, status);
     if (jobPosting == null)
-      return new ResponseEntity<>("Unable to update status.", HttpStatus.BAD_REQUEST);
-
-    return new ResponseEntity<>(jobPosting, HttpStatus.OK);
+      return Response.status(400, "Unable to update status.").build();
+    return Response.ok(jobPosting).build();
   }
 
-  @PutMapping("/status/multiple/{status}")
-  public ResponseEntity updateMultipleJobStatuses(@RequestBody List<Long> jobStatuses,
-                                                  @PathVariable("status") String status) {
+  @PUT
+  @Path("/status/multiple/{status}")
+  public Response updateMultipleJobStatuses(List<Long> jobStatuses,
+                                            @PathParam("status") String status) {
     var jobPostings = jobService.updateMultipleJobStatuses(jobStatuses, status);
-    return new ResponseEntity<>(jobPostings, HttpStatus.OK);
+    return Response.ok(jobPostings).build();
   }
 }

@@ -1,6 +1,10 @@
 package com.ajisaac.scrapebatch.dto;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface HighlightWordRepository extends JpaRepository<HighlightWord, Long> {
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class HighlightWordRepository implements PanacheRepository<HighlightWord> {
 }

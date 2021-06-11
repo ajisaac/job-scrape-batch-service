@@ -140,16 +140,25 @@ public class ScrapeJob {
     if (type == null) {
       return null;
     }
-    return switch (type) {
-      case INDEED -> new MultiPageScrapingExecutor(new IndeedScraper(this));
-      case WWR -> new SinglePageScrapingExecutor(new WwrScraper(this));
-      case REMOTIVEIO -> new SinglePageScrapingExecutor(new RemoteivioScraper(this));
-      case REMOTECO -> new SinglePageScrapingExecutor(new RemotecoScraper(this));
-      case REMOTEOKIO -> new SinglePageScrapingExecutor(new RemoteokioScraper(this));
-      case SITEPOINT -> new MultiPageScrapingExecutor(new SitepointScraper(this));
-      case STACKOVERFLOW -> new MultiPageScrapingExecutor(new StackoverflowScraper(this));
-      case WORKINGNOMADS -> new SinglePageScrapingExecutor(new WorkingNomadsScraper(this));
-    };
+    switch (type) {
+      case INDEED:
+        return new MultiPageScrapingExecutor(new IndeedScraper(this));
+      case WWR:
+        return new SinglePageScrapingExecutor(new WwrScraper(this));
+      case REMOTIVEIO:
+        return new SinglePageScrapingExecutor(new RemoteivioScraper(this));
+      case REMOTECO:
+        return new SinglePageScrapingExecutor(new RemotecoScraper(this));
+      case REMOTEOKIO:
+        return new SinglePageScrapingExecutor(new RemoteokioScraper(this));
+      case SITEPOINT:
+        return new MultiPageScrapingExecutor(new SitepointScraper(this));
+      case STACKOVERFLOW:
+        return new MultiPageScrapingExecutor(new StackoverflowScraper(this));
+      case WORKINGNOMADS:
+        return new SinglePageScrapingExecutor(new WorkingNomadsScraper(this));
+    }
+    return null;
   }
 
   public ScrapingExecutorType getTypeFromScrapeJob() {

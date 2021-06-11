@@ -10,7 +10,7 @@ import javax.persistence.*;
  * the job site we scraped or just errors we had scraping that job site. Be warned.
  */
 @Entity
-public final class JobPosting {
+public class JobPosting {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
