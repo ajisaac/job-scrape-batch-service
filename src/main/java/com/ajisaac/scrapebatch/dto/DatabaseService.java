@@ -26,15 +26,17 @@ public class DatabaseService {
     return jobPostingRepository.findAll().list();
   }
 
-  public JobPosting getJobById(Long id) {
-    return jobPostingRepository.findById(id);
-  }
-
   @Transactional
-  public JobPosting updateJobPosting(JobPosting jp) {
-    if (jp != null)
-      jobPostingRepository.persist(jp);
-    return jp;
+  public JobPosting updateJobStatus(Long id, Status status) {
+
+    var job = jobPostingRepository.findById(id);
+    if (job == null)
+      return null;
+
+    job.setStatus(status.getLowercase());
+    jobPostingRepository.persist(job);
+
+    return job;
   }
 
   @Transactional
@@ -72,4 +74,6 @@ public class DatabaseService {
   public List<HighlightWord> getHighlightWords() {
     return this.highlightWordsRepository.findAll().list();
   }
+
+
 }

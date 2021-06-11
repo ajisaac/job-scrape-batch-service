@@ -96,14 +96,8 @@ public class JobService {
     if (s == null)
       return null;
 
-    var optionalJobStatus = db.getJobById(id);
-    if (optionalJobStatus == null)
-      return null;
+    return db.updateJobStatus(id, s);
 
-    var jobPosting = optionalJobStatus;
-    jobPosting.setStatus(s.getLowercase());
-    jobPosting = db.updateJobPosting(jobPosting);
-    return jobPosting;
   }
 
   public List<JobPosting> updateMultipleJobStatuses(List<Long> ids, String status) {

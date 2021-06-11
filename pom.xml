@@ -36,10 +36,7 @@
     </dependencyManagement>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>io.quarkus</groupId>-->
-<!--            <artifactId>quarkus-hibernate-orm</artifactId>-->
-<!--        </dependency>-->
+
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-qute</artifactId>
@@ -118,16 +115,6 @@
             <artifactId>commonmark</artifactId>
             <version>0.15.0</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.seleniumhq.selenium</groupId>-->
-        <!--            <artifactId>selenium-java</artifactId>-->
-        <!--            <version>3.141.59</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.seleniumhq.selenium</groupId>-->
-        <!--            <artifactId>selenium-server</artifactId>-->
-        <!--            <version>3.141.59</version>-->
-        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.google.guava</groupId>

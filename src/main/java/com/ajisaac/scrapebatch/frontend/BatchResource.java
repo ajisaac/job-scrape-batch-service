@@ -23,8 +23,6 @@ public class BatchResource {
 //    this.template = template;
   }
 
-  // todo fix all this weirdness, return proper responses if failure
-
   @POST
   @Path("/scrape-job")
   public Response createScrapeJob(ScrapeJob scrapeJob) {
