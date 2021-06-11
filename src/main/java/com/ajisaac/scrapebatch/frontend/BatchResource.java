@@ -15,12 +15,14 @@ import java.util.*;
 public class BatchResource {
 
   private final BatchService batchJobService;
-  private final SimpMessagingTemplate template;
+//  private final SimpMessagingTemplate template;
 
   @Autowired
-  public BatchResource(BatchService batchJobService, SimpMessagingTemplate template) {
+  public BatchResource(BatchService batchJobService
+//                       SimpMessagingTemplate template
+  ) {
     this.batchJobService = batchJobService;
-    this.template = template;
+//    this.template = template;
   }
 
   // todo fix all this weirdness, return proper responses if failure

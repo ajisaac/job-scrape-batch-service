@@ -3,7 +3,6 @@ package com.ajisaac.scrapebatch.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 public class HighlightWord {

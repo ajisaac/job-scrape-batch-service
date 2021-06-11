@@ -119,7 +119,7 @@ public class BatchService {
   }
 
   public ScrapeJob createScrapeJob(ScrapeJob scrapeJob) {
-    if(scrapeJob == null)
+    if (scrapeJob == null)
       return null;
 
     List<ScrapeJob> existingJobs = getAllScrapeJobs();
