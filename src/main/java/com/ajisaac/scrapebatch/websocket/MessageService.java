@@ -1,6 +1,5 @@
 package com.ajisaac.scrapebatch.websocket;
 
-import com.ajisaac.scrapebatch.websocket.dto.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

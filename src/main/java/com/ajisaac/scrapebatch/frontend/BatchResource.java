@@ -67,8 +67,4 @@ public class BatchResource {
     return new ResponseEntity<>(errMsg, HttpStatus.BAD_REQUEST);
   }
 
-  @PostMapping("/message")
-  public void addMessage(@RequestBody String msg){
-    template.convertAndSend("/topic/messages", msg);
-  }
 }

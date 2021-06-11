@@ -2,7 +2,7 @@ package com.ajisaac.scrapebatch.network;
 
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.websocket.MessageService;
-import com.ajisaac.scrapebatch.websocket.dto.Message;
+import com.ajisaac.scrapebatch.websocket.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

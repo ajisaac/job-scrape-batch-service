@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch.websocket.dto;
+package com.ajisaac.scrapebatch.websocket;
 
 import java.util.Objects;
 
