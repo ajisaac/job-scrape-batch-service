@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch.frontend;
+package com.ajisaac.scrapebatch.service;
 
 import com.ajisaac.scrapebatch.dto.*;
 import com.google.common.base.Strings;
@@ -53,16 +53,7 @@ public class JobService {
 
   private void highlightJobDescriptions(Companies companies) {
     List<HighlightWord> buzzwords = db.getHighlightWords();
-    for (var c : companies.getCompanies()) {
-      for (JobPosting jp : c.getJobPostings()) {
-        var desc = jp.getDescription();
-        desc = highlightJobDescription(desc, buzzwords);
-        jp.setDescription(desc);
-      }
-    }
-  }
 
-  private String highlightJobDescription(String desc, List<HighlightWord> buzzwords) {
     buzzwords.sort((word1, word2) -> {
       var w1 = word1.getName().toLowerCase(Locale.ROOT);
       var w2 = word2.getName().toLowerCase(Locale.ROOT);
@@ -78,6 +69,20 @@ public class JobService {
       return w1.compareTo(w2);
 
     });
+
+    for (var c : companies.getCompanies()) {
+      for (JobPosting jp : c.getJobPostings()) {
+        var desc = jp.getDescription();
+        desc = highlightJobDescription(desc, buzzwords);
+        jp.setDescription(desc);
+      }
+    }
+  }
+
+  private String highlightJobDescription(String desc, List<HighlightWord> buzzwords) {
+    if (desc == null || buzzwords == null || buzzwords.isEmpty())
+      return desc;
+
 
     for (HighlightWord buzzword : buzzwords) {
       // todo make this much better

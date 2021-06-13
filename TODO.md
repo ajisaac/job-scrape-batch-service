@@ -100,38 +100,3 @@ careerbuilder - Similar to monster, no remote only options, tons of contractor c
 dice.com - The worst of the contractor crap.
 remote4me.com - javascript needed. decent jobs. appears to have stopped scraping.
 remotelyawesomejobs.com - no javascript needed. Decent list. Slow as shit, times out. 
-
-
-# History of Project
-- First we scraped just indeed with node.js called manually
-- The frontend was spring boot and react
-- Store was postgres or mysql.
-- Then we rewrote the frontend in server side mustache and plain javascript
-	- React felt slow. This was due to us running in dev mode...
-	- This used spring boot, but JDBC instead of JPA 
-		- This was a mistake because of added complexity.
-	- Everything was by hand
-- This was all over the period of 1 or 2 months.
-	- Was able to use it to find a job, so it was at least a success.
----
-- Then we rewrote the scraper in golang to get away from javascript
-- Switched to SQLlite for simplicity and easily moving data.
-- Then it just felt wrong so we wrote a separate spring boot scraper service
-	- Ditched golang for Spring Boot which I was more productive with.
-	- This did async for each scraper, so we could scrape multiple sites at
-		the same time.
-- Added a bunch of different scrapers and made it somewhat nice
-- Moved back to MySql because SQLlite was giving me a headache.
-- The frontend was complex and weird so moved back to React/Redux.
-	- Offloaded the post processing and filtering to redux.
-	- Removed a ton of complexity from plain javascript.
-	- Was pretty easy to migrate Mustache components to React components.
-- Rewrote the server side of the frontend in much nicer Spring boot and JPA.
-	- This was standard CRUD
-	- There was no funny business, most things are done on the frontend in React.
-- With architecture in place, found that the code was becoming a pain.
-	- Rewrite all the Java in Golang.
-- Currently rewriting and adding features.
-- Finding that Golang reduces the amount of code by more than half.
-- Also because Golang isn't pattern heavy, the code is a lot easier to read.
----

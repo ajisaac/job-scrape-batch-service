@@ -1,4 +1,4 @@
-package com.ajisaac.scrapebatch.frontend;
+package com.ajisaac.scrapebatch.service;
 
 import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;

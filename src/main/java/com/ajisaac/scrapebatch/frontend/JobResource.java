@@ -1,6 +1,7 @@
 package com.ajisaac.scrapebatch.frontend;
 
 import com.ajisaac.scrapebatch.dto.*;
+import com.ajisaac.scrapebatch.service.JobService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

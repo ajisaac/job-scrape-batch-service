@@ -160,8 +160,8 @@ public class WwrScraper implements Scraper {
       // default values
       uriBuilder.setScheme("https");
       uriBuilder.setHost("weworkremotely.com");
-      uriBuilder.setPath("categories/remote-back-end-programming-jobs");
-      // uriBuilder.setPath("categories/remote-full-stack-programming-jobs");
+//      uriBuilder.setPath("categories/remote-back-end-programming-jobs");
+       uriBuilder.setPath("categories/remote-full-stack-programming-jobs");
       // uriBuilder.setPath("categories/remote-front-end-programming-jobs");
       return uriBuilder.build();
     } catch (URISyntaxException e) {

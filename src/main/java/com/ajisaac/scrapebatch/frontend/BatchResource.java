@@ -2,6 +2,7 @@ package com.ajisaac.scrapebatch.frontend;
 
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
+import com.ajisaac.scrapebatch.service.BatchService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
