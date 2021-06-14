@@ -19,29 +19,23 @@ public class JobResource {
     this.jobService = jobService;
   }
 
-  @GET
+  @POST
   @Path("/all")
-  public List<JobPosting> getAllJobs() {
-    return jobService.getAllJobs();
-  }
-
-  @GET
-  @Path("/all/bycompany")
-  public Companies getAllJobsByCompany() {
-    return jobService.getAllJobsByCompany();
+  public List<JobPosting> getAllJobs(Filtering filtering) {
+    return jobService.getAllJobs(filtering);
   }
 
   @GET
   @Path("/backup")
-  public Companies backup() {
-    return getAllJobsByCompany();
+  public List<JobPosting> backup() {
+    return getAllJobs(null);
   }
 
   @POST
   @Path("/new/angelco")
-  public Companies addAngelCoJobPosting(JobPosting posting) {
+  public List<JobPosting> addAngelCoJobPosting(JobPosting posting) {
     jobService.addAngelCoJobPosting(posting);
-    return getAllJobsByCompany();
+    return getAllJobs(null);
   }
 
   @PUT

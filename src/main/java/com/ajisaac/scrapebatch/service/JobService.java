@@ -10,48 +10,21 @@ import java.util.*;
 public class JobService {
 
   private final DatabaseService db;
+  private final FilteringService filteringService;
 
-  public JobService(DatabaseService db) {
+  public JobService(DatabaseService db, FilteringService filteringService) {
     this.db = db;
-
+    this.filteringService = filteringService;
   }
 
-  public List<JobPosting> getAllJobs() {
-    return db.getAllJobPostings();
+  public List<JobPosting> getAllJobs(Filtering filtering) {
+    var postings = db.getAllJobPostings();
+    postings = filteringService.optimalFiltering(postings, filtering);
+    highlightJobDescriptions(postings);
+    return postings;
   }
 
-  public Companies getAllJobsByCompany() {
-    Map<String, List<JobPosting>> cMap = new HashMap<>();
-
-    for (JobPosting job : db.getAllJobPostings()) {
-      var c = Strings.nullToEmpty(job.getCompany());
-
-      if (c.isBlank())
-        c = "unknown";
-
-      if (cMap.containsKey(c)) {
-        cMap.get(c).add(job);
-      } else {
-        List<JobPosting> list = new ArrayList<>();
-        list.add(job);
-        cMap.put(c, list);
-      }
-    }
-
-    // map the map to list of companies
-    long id = 1;
-    var companies = new Companies();
-    for (Map.Entry<String, List<JobPosting>> es : cMap.entrySet()) {
-      var company = new Company(id++, es.getKey(), es.getValue());
-      companies.addCompany(company);
-    }
-
-    highlightJobDescriptions(companies);
-
-    return companies;
-  }
-
-  private void highlightJobDescriptions(Companies companies) {
+  private void highlightJobDescriptions(List<JobPosting> postings) {
     List<HighlightWord> buzzwords = db.getHighlightWords();
 
     buzzwords.sort((word1, word2) -> {
@@ -70,12 +43,10 @@ public class JobService {
 
     });
 
-    for (var c : companies.getCompanies()) {
-      for (JobPosting jp : c.getJobPostings()) {
-        var desc = jp.getDescription();
-        desc = highlightJobDescription(desc, buzzwords);
-        jp.setDescription(desc);
-      }
+    for (JobPosting jp : postings) {
+      var desc = jp.getDescription();
+      desc = highlightJobDescription(desc, buzzwords);
+      jp.setDescription(desc);
     }
   }
 
