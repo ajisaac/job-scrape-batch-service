@@ -21,38 +21,30 @@ public class JobResource {
 
   @POST
   @Path("/all")
-  public List<JobPosting> getAllJobs(Filtering filtering) {
-    return jobService.getAllJobs(filtering);
+  public PostingsAndFilter getAllJobs(Filtering filtering) {
+    List<JobPosting> postings = jobService.getAllJobs(filtering);
+    return new PostingsAndFilter(postings, filtering);
   }
 
-  @GET
-  @Path("/backup")
-  public List<JobPosting> backup() {
-    return getAllJobs(null);
-  }
+//  @GET
+//  @Path("/backup")
+//  public List<JobPosting> backup() {
+//    return getAllJobs(null);
+//  }
+//
+//  @POST
+//  @Path("/new/angelco")
+//  public List<JobPosting> addAngelCoJobPosting(JobPosting posting) {
+//    jobService.addAngelCoJobPosting(posting);
+//    return getAllJobs(null);
+//  }
 
   @POST
-  @Path("/new/angelco")
-  public List<JobPosting> addAngelCoJobPosting(JobPosting posting) {
-    jobService.addAngelCoJobPosting(posting);
-    return getAllJobs(null);
-  }
-
-  @PUT
   @Path("/status/{id}/{status}")
-  public Response updateJobStatus(@PathParam("id") Long id,
-                                  @PathParam("status") String status) {
-    var jobPosting = jobService.updateJobStatus(id, status);
-    if (jobPosting == null)
-      return Response.status(400, "Unable to update status.").build();
-    return Response.ok(jobPosting).build();
-  }
-
-  @PUT
-  @Path("/status/multiple/{status}")
-  public Response updateMultipleJobStatuses(List<Long> jobStatuses,
-                                            @PathParam("status") String status) {
-    var jobPostings = jobService.updateMultipleJobStatuses(jobStatuses, status);
-    return Response.ok(jobPostings).build();
+  public PostingsAndFilter updateJobStatus(@PathParam("id") Long id,
+                                           @PathParam("status") String status,
+                                           Filtering filter) {
+    jobService.updateJobStatus(id, status);
+    return getAllJobs(filter);
   }
 }

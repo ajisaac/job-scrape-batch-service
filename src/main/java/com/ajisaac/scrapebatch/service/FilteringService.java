@@ -5,10 +5,7 @@ import com.ajisaac.scrapebatch.dto.JobPosting;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -191,25 +188,6 @@ public class FilteringService {
       .collect(Collectors.toList());
   }
 
-  private List<JobPosting> filterOutCompanyList(List<String> companies, List<JobPosting> postings) {
-    List<String> comps = new ArrayList<>();
-    for (var c : companies) {
-      comps.add(c.toLowerCase(Locale.ROOT));
-    }
-    return postings
-      .stream()
-      .filter(jobPosting -> {
-        var jp = jobPosting.getCompany().toLowerCase(Locale.ROOT);
-        for (var c : comps) {
-          if (c.equals(jp)) {
-            return false;
-          }
-        }
-        return true;
-      })
-      .collect(Collectors.toList());
-  }
-
   public List<JobPosting> optimalFiltering(List<JobPosting> postings, Filtering filtering) {
     if (filtering == null) {
       return postings;
@@ -222,12 +200,10 @@ public class FilteringService {
     }
 
     // if there is company filtering
-    boolean filteredCompanyName = false;
     String company = filtering.getCompany();
     if (company != null && !company.isBlank()) {
       // we don't need to black or greylist
       postings = filterByCompany(company, postings);
-      filteredCompanyName = true;
     }
 
     Map<String, Boolean> statuses = filtering.getStatuses();
@@ -236,27 +212,10 @@ public class FilteringService {
       postings = filterByStatuses(statuses, postings);
     }
 
-    if (!filteredCompanyName) {
-
-      if (filtering.isFilterGraylist()) {
-        List<String> greylisted = companyService.getGraylisted();
-        if (greylisted != null && !greylisted.isEmpty()) {
-          postings = filterOutCompanyList(greylisted, postings);
-        }
-      }
-
-      if (filtering.isFilterBlacklist()) {
-        List<String> blacklisted = companyService.getBlacklisted();
-        if (blacklisted != null && !blacklisted.isEmpty()) {
-          postings = filterOutCompanyList(blacklisted, postings);
-        }
-      }
-
-    }
 
     // search the title/description
-    List<String> descriptionTexts = filtering.getJobDescriptionTexts();
-    List<String> titleTexts = filtering.getJobTitleTexts();
+    List<String> descriptionTexts = Arrays.asList(filtering.getJobDescriptionText().split(","));
+    List<String> titleTexts = Arrays.asList(filtering.getJobTitleText().split(","));
 
     postings = filterSearchTexts(descriptionTexts, titleTexts, postings);
 

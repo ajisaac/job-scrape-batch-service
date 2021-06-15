@@ -12,16 +12,12 @@ public class Filtering {
   private Map<String, Boolean> statuses;
   // any particular set of job sites
   private Map<String, Boolean> jobSites;
-  // do we filter out blacklisted
-  private boolean filterBlacklist;
-  // do we filter out graylisted
-  private boolean filterGraylist;
   // company name to filter by
   private String company;
   // texts to search for in job description
-  private List<String> jobDescriptionTexts;
+  private String jobDescriptionText;
   // texts to search for in job title
-  private List<String> jobTitleTexts;
+  private String jobTitleText;
 
   public Map<String, Boolean> getStatuses() {
     return statuses;
@@ -39,22 +35,6 @@ public class Filtering {
     this.jobSites = jobSites;
   }
 
-  public boolean isFilterBlacklist() {
-    return filterBlacklist;
-  }
-
-  public void setFilterBlacklist(boolean filterBlacklist) {
-    this.filterBlacklist = filterBlacklist;
-  }
-
-  public boolean isFilterGraylist() {
-    return filterGraylist;
-  }
-
-  public void setFilterGraylist(boolean filterGraylist) {
-    this.filterGraylist = filterGraylist;
-  }
-
   public String getCompany() {
     return company;
   }
@@ -63,20 +43,19 @@ public class Filtering {
     this.company = company;
   }
 
-  public List<String> getJobDescriptionTexts() {
-    return jobDescriptionTexts;
+  public String getJobDescriptionText() {
+    return jobDescriptionText == null ? "" : jobDescriptionText;
   }
 
-  public void setJobDescriptionTexts(List<String> jobDescriptionTexts) {
-    this.jobDescriptionTexts = jobDescriptionTexts;
+  public void setJobDescriptionText(String jobDescriptionText) {
+    this.jobDescriptionText = jobDescriptionText;
   }
 
-  public List<String> getJobTitleTexts() {
-    return jobTitleTexts;
+  public String getJobTitleText() {
+    return jobTitleText == null ? "" : jobTitleText;
   }
 
-  public void setJobTitleTexts(List<String> jobTitleTexts) {
-    this.jobTitleTexts = jobTitleTexts;
+  public void setJobTitleText(String jobTitleText) {
+    this.jobTitleText = jobTitleText;
   }
-
 }

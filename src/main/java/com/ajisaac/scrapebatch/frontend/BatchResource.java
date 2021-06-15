@@ -24,6 +24,9 @@ public class BatchResource {
 //    this.template = template;
   }
 
+  /**
+   * Only used from postman
+   */
   @POST
   @Path("/scrape-job")
   public Response createScrapeJob(ScrapeJob scrapeJob) {
@@ -33,6 +36,9 @@ public class BatchResource {
     return Response.accepted(scrapeJob).build();
   }
 
+  /**
+   * Only used from postman
+   */
   @POST
   @Path("/scrape-jobs")
   public Response createScrapeJobs(List<ScrapeJob> scrapeJobs) {
