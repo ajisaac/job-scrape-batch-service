@@ -146,7 +146,7 @@ public class ScrapeJob {
       case WWR:
         return new SinglePageScrapingExecutor(new WwrScraper(this));
       case REMOTIVEIO:
-        return new SinglePageScrapingExecutor(new RemoteivioScraper(this));
+        return new SinglePageScrapingExecutor(new RemotiveioScraper(this));
       case REMOTECO:
         return new SinglePageScrapingExecutor(new RemotecoScraper(this));
       case REMOTEOKIO:

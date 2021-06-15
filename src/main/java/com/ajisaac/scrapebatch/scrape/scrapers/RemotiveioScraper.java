@@ -19,12 +19,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteivioScraper implements Scraper {
+public class RemotiveioScraper implements Scraper {
   private final String remotiveioUrl = "https://remotive.io/remote-jobs/software-dev";
 
   private final ScrapeJob scrapeJob;
 
-  public RemoteivioScraper(ScrapeJob scrapeJob) {
+  public RemotiveioScraper(ScrapeJob scrapeJob) {
     this.scrapeJob = scrapeJob;
   }
 

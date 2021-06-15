@@ -181,7 +181,7 @@ public class FilteringService {
           return false;
 
         for (var js : jobSites.entrySet())
-          if (js.getValue() && js.getKey().equals(jobPosting.getJobSite())) return true;
+          if (js.getValue() && js.getKey().toLowerCase(Locale.ROOT).equals(jobPosting.getJobSite().toLowerCase(Locale.ROOT))) return true;
 
         return false;
       })
