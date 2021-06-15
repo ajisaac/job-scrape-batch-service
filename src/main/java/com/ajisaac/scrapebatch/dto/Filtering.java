@@ -1,6 +1,7 @@
 package com.ajisaac.scrapebatch.dto;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Explains how to filter a list of JobPostings
@@ -8,9 +9,9 @@ import java.util.List;
 public class Filtering {
 
   // any particular set of job statuses
-  private List<String> statuses;
+  private Map<String, Boolean> statuses;
   // any particular set of job sites
-  private List<String> jobSites;
+  private Map<String, Boolean> jobSites;
   // do we filter out blacklisted
   private boolean filterBlacklist;
   // do we filter out graylisted
@@ -21,22 +22,20 @@ public class Filtering {
   private List<String> jobDescriptionTexts;
   // texts to search for in job title
   private List<String> jobTitleTexts;
-  // number of elements
-  private Integer limit;
 
-  public List<String> getStatuses() {
+  public Map<String, Boolean> getStatuses() {
     return statuses;
   }
 
-  public void setStatuses(List<String> statuses) {
+  public void setStatuses(Map<String, Boolean> statuses) {
     this.statuses = statuses;
   }
 
-  public List<String> getJobSites() {
+  public Map<String, Boolean> getJobSites() {
     return jobSites;
   }
 
-  public void setJobSites(List<String> jobSites) {
+  public void setJobSites(Map<String, Boolean> jobSites) {
     this.jobSites = jobSites;
   }
 
@@ -80,11 +79,4 @@ public class Filtering {
     this.jobTitleTexts = jobTitleTexts;
   }
 
-  public Integer getLimit() {
-    return limit;
-  }
-
-  public void setLimit(Integer limit) {
-    this.limit = limit;
-  }
 }

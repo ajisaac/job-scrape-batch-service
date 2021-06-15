@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -30,24 +31,46 @@ public class FilteringService {
       .collect(Collectors.toList());
   }
 
-  private List<JobPosting> filterByStatuses(List<String> statuses, List<JobPosting> postings) {
-    List<String> newStatuses = new ArrayList<>();
-    for (var s : statuses) {
-      newStatuses.add(s.toLowerCase(Locale.ROOT));
+  private List<JobPosting> filterByStatuses(Map<String, Boolean> statuses, List<JobPosting> postings) {
+    if (statuses == null || statuses.isEmpty()) {
+      return postings;
     }
+
+    boolean allChecked = true;
+    for (Boolean checked : statuses.values()) {
+      if (!checked) {
+        allChecked = false;
+        break;
+      }
+    }
+    if (allChecked) {
+      return postings;
+    }
+
+    boolean noneChecked = true;
+    for (Boolean checked : statuses.values()) {
+      if (checked) {
+        noneChecked = false;
+        break;
+      }
+    }
+    if (noneChecked) {
+      return postings;
+    }
+
+
     return postings
       .stream()
       .filter(jobPosting -> {
         // include postings with one of these statuses
         var s = jobPosting.getStatus();
-        if (s == null) {
+        if (s == null)
           return false;
-        }
-        for (var status : newStatuses) {
-          if (s.equals(status)) {
+
+        for (var status : statuses.entrySet())
+          if (status.getValue() && status.getKey().equals(s))
             return true;
-          }
-        }
+
         return false;
       })
       .collect(Collectors.toList());
@@ -56,8 +79,7 @@ public class FilteringService {
   // both searches everything and applies our paging limit
   private List<JobPosting> filterSearchTexts(List<String> descriptionTexts,
                                              List<String> titleTexts,
-                                             List<JobPosting> postings,
-                                             int limit) {
+                                             List<JobPosting> postings) {
 
     if (postings == null || postings.isEmpty()) {
       return new ArrayList<>();
@@ -80,14 +102,11 @@ public class FilteringService {
     }
 
     int found = 0;
-    if (limit == 0) {
-      limit = 10;
-    }
 
     List<JobPosting> newPostings = new ArrayList<>();
 
     for (var posting : postings) {
-      if (found >= limit) {
+      if (found >= LIMIT) {
         break;
       }
 
@@ -102,6 +121,7 @@ public class FilteringService {
     return newPostings;
   }
 
+  // additive filtering
   private boolean searchTitleText(JobPosting posting, List<String> newTitleTexts) {
     for (var t : newTitleTexts) {
       var title = posting.getJobTitle();
@@ -115,6 +135,7 @@ public class FilteringService {
     return false;
   }
 
+  // additive filtering
   private boolean searchDescriptionText(JobPosting posting, List<String> newDescriptionTexts) {
     for (var t : newDescriptionTexts) {
       var description = posting.getDescription();
@@ -128,15 +149,43 @@ public class FilteringService {
     return false;
   }
 
-  private List<JobPosting> filterByJobSite(List<String> jobSites, List<JobPosting> postings) {
+  private List<JobPosting> filterByJobSite(Map<String, Boolean> jobSites, List<JobPosting> postings) {
+    if (jobSites == null || jobSites.isEmpty()) {
+      return postings;
+    }
+
+    boolean allChecked = true;
+    for (Boolean checked : jobSites.values()) {
+      if (!checked) {
+        allChecked = false;
+        break;
+      }
+    }
+    if (allChecked) {
+      return postings;
+    }
+
+    boolean noneChecked = true;
+    for (Boolean checked : jobSites.values()) {
+      if (checked) {
+        noneChecked = false;
+        break;
+      }
+    }
+    if (noneChecked) {
+      return postings;
+    }
+
     return postings
       .stream()
       .filter(jobPosting -> {
-        for (var js : jobSites) {
-          if (js.equals(jobPosting.getJobSite())) {
-            return true;
-          }
-        }
+        var s = jobPosting.getJobSite();
+        if (s == null)
+          return false;
+
+        for (var js : jobSites.entrySet())
+          if (js.getValue() && js.getKey().equals(jobPosting.getJobSite())) return true;
+
         return false;
       })
       .collect(Collectors.toList());
@@ -161,16 +210,13 @@ public class FilteringService {
       .collect(Collectors.toList());
   }
 
-  /**
-   * optimal filtering against these parameters
-   */
   public List<JobPosting> optimalFiltering(List<JobPosting> postings, Filtering filtering) {
     if (filtering == null) {
       return postings;
     }
 
     // widest swatch of jobs to filter
-    List<String> jobSites = filtering.getJobSites();
+    Map<String, Boolean> jobSites = filtering.getJobSites();
     if (jobSites != null && !jobSites.isEmpty()) {
       postings = filterByJobSite(jobSites, postings);
     }
@@ -184,7 +230,7 @@ public class FilteringService {
       filteredCompanyName = true;
     }
 
-    List<String> statuses = filtering.getStatuses();
+    Map<String, Boolean> statuses = filtering.getStatuses();
     if (statuses != null && !statuses.isEmpty()) {
       // there is some amount of statuses to filter by
       postings = filterByStatuses(statuses, postings);
@@ -212,7 +258,7 @@ public class FilteringService {
     List<String> descriptionTexts = filtering.getJobDescriptionTexts();
     List<String> titleTexts = filtering.getJobTitleTexts();
 
-    postings = filterSearchTexts(descriptionTexts, titleTexts, postings, LIMIT);
+    postings = filterSearchTexts(descriptionTexts, titleTexts, postings);
 
     return postings;
   }
