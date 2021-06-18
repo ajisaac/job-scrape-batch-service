@@ -27,6 +27,10 @@ public class ScrapeJob {
 
   private String site;
   private String name;
+
+  // only used by some scrapers
+  private String url;
+
   private String query;
   private String location;
   private boolean remote;
@@ -106,11 +110,21 @@ public class ScrapeJob {
     this.site = site;
   }
 
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
   /**
    * weak compare using name and site
    */
   public boolean weakEquals(ScrapeJob sj) {
-    return Objects.equals(site, sj.site) && Objects.equals(name, sj.name);
+    return Objects.equals(site, sj.site)
+      && Objects.equals(name, sj.name)
+      && Objects.equals(url, sj.url);
   }
 
   @Override
@@ -126,12 +140,13 @@ public class ScrapeJob {
       && Objects.equals(query, scrapeJob.query)
       && Objects.equals(location, scrapeJob.location)
       && Objects.equals(jobType, scrapeJob.jobType)
+      && Objects.equals(url, scrapeJob.url)
       && Objects.equals(sortType, scrapeJob.sortType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, site, name, query, location, remote, radius, jobType, sortType);
+    return Objects.hash(id, site, name, query, location, remote, radius, jobType, sortType, url);
   }
 
   @JsonIgnore

@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 
 public class WwrScraper implements Scraper {
 
-//  private final ScrapeJob scrapeJob;
+  private final ScrapeJob scrapeJob;
 
   public WwrScraper(ScrapeJob scrapeJob) {
-//    this.scrapeJob = scrapeJob;
+    this.scrapeJob = scrapeJob;
   }
 
   public List<JobPosting> parseMainPage(String pageText) {
@@ -150,23 +150,13 @@ public class WwrScraper implements Scraper {
     return ScrapingExecutorType.WWR;
   }
 
-
-  //private final String WwrHref = "https://weworkremotely.com/categories/remote-back-end-programming-jobs";
-//private final String WwrHref = "https://weworkremotely.com/categories/remote-full-stack-programming-jobs";
-//private final String WwrHref = "https://weworkremotely.com/categories/remote-front-end-programming-jobs";
   public URI getNextMainPageURI() {
-    var uriBuilder = new URIBuilder();
-    try {
-      // default values
-      uriBuilder.setScheme("https");
-      uriBuilder.setHost("weworkremotely.com");
-//      uriBuilder.setPath("categories/remote-back-end-programming-jobs");
-       uriBuilder.setPath("categories/remote-full-stack-programming-jobs");
-      // uriBuilder.setPath("categories/remote-front-end-programming-jobs");
-      return uriBuilder.build();
-    } catch (URISyntaxException e) {
-      return null;
+    String url = scrapeJob.getUrl();
+    if (url == null || url.isBlank()) {
+      throw new RuntimeException();
     }
+
+    return URI.create(this.scrapeJob.getUrl());
   }
 
   @Override
