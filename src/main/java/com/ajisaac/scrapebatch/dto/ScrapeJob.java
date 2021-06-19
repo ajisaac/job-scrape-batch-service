@@ -5,6 +5,9 @@ import com.ajisaac.scrapebatch.scrape.executors.MultiPageScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.executors.ScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.executors.SinglePageScrapingExecutor;
 import com.ajisaac.scrapebatch.scrape.scrapers.*;
+import com.ajisaac.scrapebatch.scrape.scrapers.unused.IndeedScraper;
+import com.ajisaac.scrapebatch.scrape.scrapers.unused.RemotiveioScraper;
+import com.ajisaac.scrapebatch.scrape.scrapers.unused.SitepointScraper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

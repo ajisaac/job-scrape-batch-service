@@ -30,11 +30,19 @@ public class JobPosting {
   private String jobSite;
   @Column(columnDefinition = "TEXT")
   private String description;
-  private String type;
   private String remoteText;
   @Column(columnDefinition = "TEXT")
   private String miscText;
   private String status;
+  private String scraperName;
+
+  public String getScraperName() {
+    return scraperName;
+  }
+
+  public void setScraperName(String scraperName) {
+    this.scraperName = scraperName;
+  }
 
   @JsonIgnore
   private boolean ignoreScrapeDescriptionPage;
@@ -47,7 +55,8 @@ public class JobPosting {
     this.ignoreScrapeDescriptionPage = ignoreScrapeDescriptionPage;
   }
 
-  public JobPosting() {}
+  public JobPosting() {
+  }
 
   public long getId() {
     return id;
@@ -143,14 +152,6 @@ public class JobPosting {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
   }
 
   public String getRemoteText() {

@@ -1,6 +1,5 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
-import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
@@ -16,17 +15,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class StackoverflowScraper implements Scraper {
+public class StackoverflowScraper extends Scraper {
 
   private int start = 1;
-  private boolean shouldKeepScraping = true;
 
-  private final ScrapeJob scrapeJob;
 
   public StackoverflowScraper(ScrapeJob scrapeJob) {
-    this.scrapeJob = scrapeJob;
+    super(scrapeJob);
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {
@@ -77,8 +73,7 @@ public class StackoverflowScraper implements Scraper {
     }
 
     // do we need to keep scraping
-    this.shouldKeepScraping = hasMoreResults(document);
-    if (this.shouldKeepScraping) {
+    if (hasMoreResults(document)) {
       this.start += 1;
     }
 
@@ -161,20 +156,12 @@ public class StackoverflowScraper implements Scraper {
     return ScrapingExecutorType.STACKOVERFLOW;
   }
 
-  public void setScrapeJob(ScrapeJob scrapeJob) {
-    // not needed
-  }
-
-  public JobPosting setJobSite(JobPosting jobPosting) {
-    jobPosting.setJobSite(ScrapingExecutorType.STACKOVERFLOW.toString());
-    return jobPosting;
-  }
 
   public URI getNextMainPageURI() {
     try {
-      String url = "https://stackoverflow.com/jobs";
+      String url = "https://stackoverflow.com/jobs?sort=p&r=true";
       if (start > 1) {
-        url = "https://stackoverflow.com/jobs?pg=" + start;
+        url = "https://stackoverflow.com/jobs?sort=p&r=true&pg=" + start;
       }
       return new URI(url);
     } catch (URISyntaxException e) {
@@ -182,18 +169,5 @@ public class StackoverflowScraper implements Scraper {
     }
   }
 
-  @Override
-  public void cleanseJobDescription(JobPosting posting) {
 
-  }
-
-  @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings,
-                                                       DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("STACKOVERFLOW");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
-  }
 }

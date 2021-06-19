@@ -1,9 +1,10 @@
-package com.ajisaac.scrapebatch.scrape.scrapers;
+package com.ajisaac.scrapebatch.scrape.scrapers.unused;
 
 import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
+import com.ajisaac.scrapebatch.scrape.scrapers.Scraper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,15 +19,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class RemotiveioScraper implements Scraper {
-  private final String remotiveioUrl = "https://remotive.io/remote-jobs/software-dev";
-
-  private final ScrapeJob scrapeJob;
+public class RemotiveioScraper extends Scraper {
 
   public RemotiveioScraper(ScrapeJob scrapeJob) {
-    this.scrapeJob = scrapeJob;
+    super(scrapeJob);
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {
@@ -240,14 +237,6 @@ public class RemotiveioScraper implements Scraper {
     }
   }
 
-  public JobPosting setJobSite(JobPosting jobPosting) {
-    jobPosting.setJobSite(ScrapingExecutorType.REMOTIVEIO.toString());
-    return jobPosting;
-  }
-
-  public void setScrapeJob(ScrapeJob scrapeJob) {
-    // no current need, do we need this?
-  }
 
   public URI getNextMainPageURI() {
     var uriBuilder = new URIBuilder();
@@ -262,17 +251,4 @@ public class RemotiveioScraper implements Scraper {
     }
   }
 
-  @Override
-  public void cleanseJobDescription(JobPosting posting) {
-
-  }
-
-  @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("REMOTIVEIO");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
-  }
 }

@@ -1,9 +1,10 @@
-package com.ajisaac.scrapebatch.scrape.scrapers;
+package com.ajisaac.scrapebatch.scrape.scrapers.unused;
 
 import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
+import com.ajisaac.scrapebatch.scrape.scrapers.Scraper;
 import com.google.common.base.Strings;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
@@ -15,19 +16,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class IndeedScraper implements Scraper {
+public class IndeedScraper extends Scraper {
 
   // Used for keeping track of "next page". We scrape 10 results per page generally.
   private int start = 0;
 
-  private boolean shouldKeepScraping = true;
-  // Details about our job search
-  private final ScrapeJob scrapeJob;
-
   public IndeedScraper(ScrapeJob scrapeJob) {
-    this.scrapeJob = scrapeJob;
+    super(scrapeJob);
   }
 
 
@@ -62,10 +58,9 @@ public class IndeedScraper implements Scraper {
     }
 
     // do we need to keep scraping
-    this.shouldKeepScraping = hasMoreResults(document);
-    if (this.shouldKeepScraping) {
+    if (hasMoreResults(document))
       this.start += 10;
-    }
+
 
     return jobPostings;
   }
@@ -153,18 +148,12 @@ public class IndeedScraper implements Scraper {
     }
   }
 
-  @Override
-  public void cleanseJobDescription(JobPosting posting) {
-
-  }
 
   @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("INDEED");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
+  public String getName() {
+    if (this.scrapeJob != null)
+      return this.scrapeJob.getName();
+    return "Indeed";
   }
 
   private static boolean hasMoreResults(Document document) {

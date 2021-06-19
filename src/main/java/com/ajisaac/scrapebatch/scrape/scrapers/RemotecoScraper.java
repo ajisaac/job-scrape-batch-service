@@ -1,6 +1,5 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
-import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
@@ -20,13 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RemotecoScraper implements Scraper {
-  private final String remotecoUrl = "https://remote.co/remote-jobs/developer";
-
-  private final ScrapeJob scrapeJob;
+public class RemotecoScraper extends Scraper {
 
   public RemotecoScraper(ScrapeJob scrapeJob) {
-    this.scrapeJob = scrapeJob;
+    super(scrapeJob);
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {
@@ -170,8 +166,7 @@ public class RemotecoScraper implements Scraper {
     if (descriptionEnd < 0) {
       return null;
     }
-    String description = json.substring(descriptionOccurance + 17, descriptionEnd);
-    return description;
+    return json.substring(descriptionOccurance + 17, descriptionEnd);
   }
 
   // remove the description so we can have clean json
@@ -193,15 +188,6 @@ public class RemotecoScraper implements Scraper {
     return firstHalf + secondHalf;
   }
 
-  public void setScrapeJob(ScrapeJob scrapeJob) {
-    // no current need
-  }
-
-  public JobPosting setJobSite(JobPosting jobPosting) {
-    jobPosting.setJobSite(ScrapingExecutorType.REMOTECO.toString());
-    return jobPosting;
-  }
-
   public URI getNextMainPageURI() {
     URIBuilder uriBuilder = new URIBuilder();
     try {
@@ -215,17 +201,4 @@ public class RemotecoScraper implements Scraper {
     }
   }
 
-  @Override
-  public void cleanseJobDescription(JobPosting posting) {
-
-  }
-
-  @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("REMOTECO");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
-  }
 }

@@ -5,6 +5,7 @@ import com.ajisaac.scrapebatch.websocket.MessageService;
 import com.ajisaac.scrapebatch.websocket.Message;
 
 import javax.inject.Singleton;
+import java.time.LocalTime;
 
 @Singleton
 public class WebsocketNotifier {
@@ -15,62 +16,75 @@ public class WebsocketNotifier {
     this.ms = ms;
   }
 
-  public void send(String message) {
-    System.out.println(message);
+  private String dateString() {
+    java.time.LocalTime time = LocalTime.now();
+    int hour = time.getHour();
+    int minute = time.getMinute();
+    int second = time.getSecond();
+
+    String hourString, minuteString, secondString;
+    hourString = hour <= 9 ? ("0" + hour) : (String.valueOf(hour));
+    minuteString = minute <= 9 ? ("0" + minute) : (String.valueOf(minute));
+    secondString = second <= 9 ? ("0" + second) : (String.valueOf(second));
+    return hourString + ":" + minuteString + ":" + secondString + " - ";
   }
 
-  public void error(Exception e, String siteName) {
-    var msg = e.getMessage() + " when scraping " + siteName + ".";
-    System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+  public void send(String message, String name) {
+    System.out.println(dateString() + message);
+    ms.send(new Message(name, dateString() + message));
   }
 
-  public void sleeping(int seconds, String siteName) {
-    var msg = "Sleeping for " + seconds + " while scraping " + siteName + ".";
+  public void error(Exception e, String name) {
+    var msg = dateString() + e.getMessage() + " when scraping " + name + ".";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
   }
 
-  public void successfulDescPageScrape(JobPosting jobPosting, String siteName) {
-    var msg = "Successfully scraped " + jobPosting.getJobSite() + " - " + jobPosting.getCompany()
-      + " while scraping " + siteName + ".";
+  public void sleeping(int seconds, String name) {
+    var msg = dateString() + "Sleeping for " + seconds + " seconds.";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
   }
 
-  public void failedDescPageScrape(String href, String siteName) {
-    var msg = "Failed to scrape " + href + " while scraping " + siteName + ".";
+  public void successfulDescPageScrape(JobPosting jobPosting, String name) {
+    var msg = dateString() + "Successfully scraped " + jobPosting.getJobTitle() + " - " + jobPosting.getCompany() + ".";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
   }
 
-  public void scrapingDescPage(String href, String siteName) {
-    var msg = "Scraping " + href + " from " + siteName + ".";
+  public void failedDescPageScrape(String href, String name) {
+    var msg = dateString() + "Failed to scrape " + href + ".";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
   }
 
-  public void scrapingMainPage(String href, String siteName) {
-    var msg = "Scraping main page " + href + " for " + siteName + ".";
+  public void scrapingDescPage(String href, String name) {
+    var msg = dateString() + "Scraping " + href + ".";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
   }
 
-  public void failMainPageScrape(String href, String siteName) {
-    var msg = "Failed scraping main page " + href + " for " + siteName + ".";
+  public void scrapingMainPage(String href, String name) {
+    var msg = dateString() + "Scraping main page " + href + ".";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
   }
 
-  public void successfulMainPageScrape(String href, String siteName) {
-    var msg = "Success scraping main page " + href + " for " + siteName + ".";
+  public void failMainPageScrape(String href, String name) {
+    var msg = dateString() + "Failed scraping main page " + href + ".";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
   }
 
-  public void foundPostings(int size, String siteName, String href) {
-    var msg = "Found " + size + " postings from " + href + " for " + siteName + ".";
+  public void successfulMainPageScrape(String href, String name) {
+    var msg = dateString() + "Success scraping main page " + href + ".";
     System.out.println(msg);
-    ms.send(new Message(siteName, msg));
+    ms.send(new Message(name, msg));
+  }
+
+  public void foundPostings(int size, String name, String href) {
+    var msg = dateString() + "Found " + size + " postings from " + href + ".";
+    System.out.println(msg);
+    ms.send(new Message(name, msg));
   }
 }

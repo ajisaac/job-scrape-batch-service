@@ -1,9 +1,9 @@
-package com.ajisaac.scrapebatch.scrape.scrapers;
+package com.ajisaac.scrapebatch.scrape.scrapers.unused;
 
-import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
+import com.ajisaac.scrapebatch.scrape.scrapers.Scraper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,18 +17,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class SitepointScraper implements Scraper {
+public class SitepointScraper extends Scraper {
   private int start = 1;
 
-  private boolean shouldKeepScraping = true;
-
-  private final ScrapeJob scapeJob;
-
   public SitepointScraper(ScrapeJob scrapeJob) {
-    this.scapeJob = scrapeJob;
-
+    super(scrapeJob);
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {
@@ -43,11 +37,8 @@ public class SitepointScraper implements Scraper {
       jobPostings.add(jobPosting);
     }
 
-    // do we need to keep scraping
-    this.shouldKeepScraping = hasMoreResults(document);
-    if (this.shouldKeepScraping) {
+    if (hasMoreResults(document))
       this.start += 1;
-    }
 
     return jobPostings;
   }
@@ -131,12 +122,7 @@ public class SitepointScraper implements Scraper {
   }
 
   private boolean hasMoreResults(Document document) {
-    Elements e = document.select("a[rel=next]");
-    return !e.isEmpty();
-  }
-
-  public void setScrapeJob(ScrapeJob scrapeJob) {
-    // not needed
+    return !document.select("a[rel=next]").isEmpty();
   }
 
   public URI getNextMainPageURI() {
@@ -151,22 +137,5 @@ public class SitepointScraper implements Scraper {
     }
   }
 
-  @Override
-  public void cleanseJobDescription(JobPosting posting) {
 
-  }
-
-  @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("SITEPOINT");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
-  }
-
-  public JobPosting setJobSite(JobPosting jobPosting) {
-    jobPosting.setJobSite(ScrapingExecutorType.SITEPOINT.toString());
-    return jobPosting;
-  }
 }

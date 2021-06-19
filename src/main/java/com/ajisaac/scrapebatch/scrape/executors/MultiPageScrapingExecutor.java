@@ -30,7 +30,7 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
 
   public MultiPageScrapingExecutor(Scraper scraper) {
     this.scraper = scraper;
-    this.name = scraper.getJobSite().name();
+    this.name = scraper.getName();
   }
 
   public void setDb(DatabaseService db) {
@@ -65,7 +65,7 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
 
       for (JobPosting jobPosting : jobPostings) {
         if (stopped) {
-          notifier.send("Received signal to stop");
+          notifier.send("Received signal to stop", this.name);
           return;
         }
         if (jobPosting == null)
@@ -89,8 +89,11 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
         }
 
         notifier.successfulDescPageScrape(jobPosting, this.name);
+
         jobPosting.setJobSite(scraper.getJobSite().name());
+        jobPosting.setScraperName(this.scraper.getName());
         jobPosting.setStatus("new");
+
         db.storeJobPostingInDatabase(jobPosting);
       }
     }

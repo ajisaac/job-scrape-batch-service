@@ -1,10 +1,8 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
-import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
-import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Attributes;
@@ -13,17 +11,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class WwrScraper implements Scraper {
-
-  private final ScrapeJob scrapeJob;
+public class WwrScraper extends Scraper {
 
   public WwrScraper(ScrapeJob scrapeJob) {
-    this.scrapeJob = scrapeJob;
+    super(scrapeJob);
   }
 
   public List<JobPosting> parseMainPage(String pageText) {
@@ -145,35 +139,14 @@ public class WwrScraper implements Scraper {
     }
   }
 
-  @Override
   public ScrapingExecutorType getJobSite() {
     return ScrapingExecutorType.WWR;
   }
 
   public URI getNextMainPageURI() {
     String url = scrapeJob.getUrl();
-    if (url == null || url.isBlank()) {
+    if (url == null || url.isBlank())
       throw new RuntimeException();
-    }
-
     return URI.create(this.scrapeJob.getUrl());
-  }
-
-  @Override
-  public void cleanseJobDescription(JobPosting posting) {
-    String desc = posting.getDescription();
-    /*
-    for each pair of line breaks turn it into a single line break
-
-     */
-  }
-
-  @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("WWR");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
   }
 }

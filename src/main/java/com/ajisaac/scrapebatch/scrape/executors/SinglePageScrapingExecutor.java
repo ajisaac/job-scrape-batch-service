@@ -20,7 +20,7 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
 
   private final Scraper scraper;
   private final String name;
-//  @Inject
+  //  @Inject
   DatabaseService databaseService;
   private WebsocketNotifier notifier;
 
@@ -28,7 +28,7 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
 
   public SinglePageScrapingExecutor(Scraper scraper) {
     this.scraper = scraper;
-    this.name = scraper.getJobSite().name();
+    this.name = scraper.getName();
   }
 
   @Override
@@ -55,11 +55,11 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
     notifier.foundPostings(jobPostings.size(), this.name, href.toString());
 
     jobPostings = scraper.removeJobPostingsBasedOnHref(jobPostings, databaseService);
-    notifier.send("Found " + jobPostings.size() + " non duplicate postings from " + href + " for " + this.name);
+    notifier.send("Found " + jobPostings.size() + " non duplicate postings from " + href + " for " + this.name, this.name);
 
     for (JobPosting jobPosting : jobPostings) {
-      if (stopped){
-        notifier.send("Received signal to stop");
+      if (stopped) {
+        notifier.send("Received signal to stop", this.name);
         return;
 
       }
@@ -80,12 +80,14 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
       }
 
       scraper.cleanseJobDescription(jobPosting);
-      jobPosting.setJobSite(this.name);
+
+      jobPosting.setJobSite(this.scraper.getJobSite().name());
+      jobPosting.setScraperName(this.scraper.getName());
       jobPosting.setStatus("new");
 
       databaseService.storeJobPostingInDatabase(jobPosting);
     }
-    notifier.send("Finished Scraping WWR.");
+    notifier.send("Finished Scraping " + this.name + ".", this.name);
   }
 
   @Override

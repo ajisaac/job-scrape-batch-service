@@ -1,25 +1,20 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
-import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class WorkingNomadsScraper implements Scraper {
-  private final ScrapeJob scrapeJob;
+public class WorkingNomadsScraper extends Scraper {
 
   public WorkingNomadsScraper(ScrapeJob scrapeJob) {
-    this.scrapeJob = scrapeJob;
+    super(scrapeJob);
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {
@@ -107,37 +102,14 @@ public class WorkingNomadsScraper implements Scraper {
     return jobPostings;
   }
 
-  public void parseJobDescriptionPage(String jobDescriptionPage, JobPosting jobPosting) {
-  }
 
   public ScrapingExecutorType getJobSite() {
     return ScrapingExecutorType.WORKINGNOMADS;
   }
 
   public URI getNextMainPageURI() {
-    var uriBuilder = new URIBuilder();
-    try {
-      // default values
-      uriBuilder.setScheme("https");
-      uriBuilder.setHost("www.workingnomads.co");
-      uriBuilder.setPath("api/exposed_jobs/");
-      return uriBuilder.build();
-    } catch (URISyntaxException e) {
-      return null;
-    }
+    return URI.create("https://www.workingnomads.co/api/exposed_jobs");
   }
 
-  @Override
-  public void cleanseJobDescription(JobPosting posting) {
 
-  }
-
-  @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("WORKINGNOMADS");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
-  }
 }

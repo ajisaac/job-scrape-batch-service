@@ -1,6 +1,5 @@
 package com.ajisaac.scrapebatch.scrape.scrapers;
 
-import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.dto.ScrapeJob;
 import com.ajisaac.scrapebatch.scrape.ScrapingExecutorType;
@@ -17,13 +16,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class RemoteokioScraper implements Scraper {
-  private final String remoteokioUrl = "https://remoteok.io/remote-dev-jobs";
+public class RemoteokioScraper extends Scraper {
 
-  private final ScrapeJob scrapeJob;
   public RemoteokioScraper(ScrapeJob scrapeJob) {
-    this.scrapeJob = scrapeJob;
-
+    super(scrapeJob);
   }
 
   public List<JobPosting> parseMainPage(String mainPage) {
@@ -61,10 +57,7 @@ public class RemoteokioScraper implements Scraper {
       if (match.isPresent()) {
         m = match.get();
       }
-      JobPosting jobPosting = parseBasicJobPosting(job, m);
-      if (jobPosting != null) {
-        jobPostings.add(jobPosting);
-      }
+      jobPostings.add(parseBasicJobPosting(job, m));
     }
     return jobPostings;
   }
@@ -74,7 +67,9 @@ public class RemoteokioScraper implements Scraper {
     return ScrapingExecutorType.REMOTEOKIO;
   }
 
-  /** Parse the basic job that we got from the main page. */
+  /**
+   * Parse the basic job that we got from the main page.
+   */
   private JobPosting parseBasicJobPosting(Element job, Element additionalDetails) {
     JobPosting jobPosting = new JobPosting();
 
@@ -102,7 +97,7 @@ public class RemoteokioScraper implements Scraper {
 
     // date;
     Element te = job.selectFirst("time[datetime]");
-    if(te != null){
+    if (te != null) {
       String date = te.attr("datetime");
       jobPosting.setDate(date);
     }
@@ -130,7 +125,8 @@ public class RemoteokioScraper implements Scraper {
     }
 
     // if not, grab the detailed description
-    if (!containsDetailedDescription) {}
+    if (!containsDetailedDescription) {
+    }
 
     // misc
     if (additionalDetails != null) {
@@ -176,15 +172,21 @@ public class RemoteokioScraper implements Scraper {
 
   @Override
   public void cleanseJobDescription(JobPosting posting) {
-
+    String description = posting.getDescription();
+    if (description != null) {
+      String newDesc = "";
+      var split = description.split("\n");
+      for (String s : split) {
+        newDesc = newDesc.concat(s).concat("<br>");
+      }
+      posting.setDescription(newDesc);
+    }
   }
 
   @Override
-  public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    // remove job postings that already exist
-    List<String> existingHrefs = dbService.getHrefsForSite("REMOTEOKIO");
-    return jobPostings.stream()
-      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
-      .collect(Collectors.toList());
+  public String getName() {
+    if (this.scrapeJob == null)
+      return "Remoteokio";
+    return this.scrapeJob.getName();
   }
 }
