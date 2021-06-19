@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SitepointScraper implements Scraper {
   private int start = 1;
@@ -157,7 +158,11 @@ public class SitepointScraper implements Scraper {
 
   @Override
   public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    return jobPostings;
+    // remove job postings that already exist
+    List<String> existingHrefs = dbService.getHrefsForSite("SITEPOINT");
+    return jobPostings.stream()
+      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
+      .collect(Collectors.toList());
   }
 
   public JobPosting setJobSite(JobPosting jobPosting) {

@@ -222,6 +222,10 @@ public class RemotecoScraper implements Scraper {
 
   @Override
   public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    return jobPostings;
+    // remove job postings that already exist
+    List<String> existingHrefs = dbService.getHrefsForSite("REMOTECO");
+    return jobPostings.stream()
+      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
+      .collect(Collectors.toList());
   }
 }

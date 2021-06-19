@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RemotiveioScraper implements Scraper {
   private final String remotiveioUrl = "https://remotive.io/remote-jobs/software-dev";
@@ -268,6 +269,10 @@ public class RemotiveioScraper implements Scraper {
 
   @Override
   public List<JobPosting> removeJobPostingsBasedOnHref(List<JobPosting> jobPostings, DatabaseService dbService) {
-    return jobPostings;
+    // remove job postings that already exist
+    List<String> existingHrefs = dbService.getHrefsForSite("REMOTIVEIO");
+    return jobPostings.stream()
+      .filter(jobPosting -> !existingHrefs.contains(jobPosting.getHref()))
+      .collect(Collectors.toList());
   }
 }
