@@ -22,8 +22,7 @@ public class JobResource {
   @POST
   @Path("/all")
   public PostingsAndFilter getAllJobs(Filtering filtering) {
-    List<JobPosting> postings = jobService.getAllJobs(filtering);
-    return new PostingsAndFilter(postings, filtering);
+    return jobService.getAllJobs(filtering);
   }
 
 //  @GET

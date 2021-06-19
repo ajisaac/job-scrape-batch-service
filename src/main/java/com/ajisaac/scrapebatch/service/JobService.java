@@ -17,11 +17,33 @@ public class JobService {
     this.filteringService = filteringService;
   }
 
-  public List<JobPosting> getAllJobs(Filtering filtering) {
+  public PostingsAndFilter getAllJobs(Filtering filtering) {
     var postings = db.getAllJobPostings();
     postings = filteringService.optimalFiltering(postings, filtering);
+
+    int companyCount = getCompanyCount(postings);
+    int jobCount = postings.size();
+
+    if (jobCount > 10)
+      postings = postings.subList(0, 10);
+
     highlightJobDescriptions(postings);
-    return postings;
+    PostingsAndFilter f = new PostingsAndFilter();
+    f.setNumCompanies(companyCount);
+    f.setNumJobs(jobCount);
+    f.setPostings(postings);
+    f.setFilter(filtering);
+
+    return f;
+
+  }
+
+  private int getCompanyCount(List<JobPosting> postings) {
+    Set<String> companies = new HashSet<>();
+    for (JobPosting posting : postings) {
+      companies.add(posting.getCompany());
+    }
+    return companies.size();
   }
 
   private void highlightJobDescriptions(List<JobPosting> postings) {

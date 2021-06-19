@@ -98,20 +98,13 @@ public class FilteringService {
       newTitleTexts.add(t.toLowerCase(Locale.ROOT));
     }
 
-    int found = 0;
-
     List<JobPosting> newPostings = new ArrayList<>();
 
     for (var posting : postings) {
-      if (found >= LIMIT) {
-        break;
-      }
-
       if (newTitleTexts.isEmpty() || searchTitleText(posting, newTitleTexts)) {
         if (newDescriptionTexts.isEmpty() || searchDescriptionText(posting, newDescriptionTexts)) {
           // if we aren't searching at all, just add everything
           newPostings.add(posting);
-          found++;
         }
       }
     }
