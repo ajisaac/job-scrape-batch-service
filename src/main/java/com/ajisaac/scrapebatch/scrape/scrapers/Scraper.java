@@ -63,4 +63,8 @@ public abstract class Scraper {
       return "";
     return this.scrapeJob.getName();
   }
+
+  public boolean moreResults(){
+    return true;
+  }
 }

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class MultiPageScrapingExecutor implements ScrapingExecutor {
 
   private final Scraper scraper;
-//  @Inject
+  //  @Inject
   DatabaseService db;
   private WebsocketNotifier notifier;
   private final String name;
@@ -45,6 +45,10 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
   public void scrape() {
 
     while (true) {
+      if (stopped) {
+        notifier.send("Received signal to stop", this.name);
+        return;
+      }
       pause(PAUSE_TIME);
       // get the page to scrape
       URI uri = scraper.getNextMainPageURI();
@@ -62,6 +66,9 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
       notifier.successfulMainPageScrape(uri.toString(), this.name);
       List<JobPosting> jobPostings = scraper.parseMainPage(mainPage);
       notifier.foundPostings(jobPostings.size(), this.name, uri.toString());
+
+      jobPostings = scraper.removeJobPostingsBasedOnHref(jobPostings, db);
+      notifier.send("Found " + jobPostings.size() + " non duplicate postings from " + uri + " for " + this.name, this.name);
 
       for (JobPosting jobPosting : jobPostings) {
         if (stopped) {
@@ -95,6 +102,10 @@ public class MultiPageScrapingExecutor implements ScrapingExecutor {
         jobPosting.setStatus("new");
 
         db.storeJobPostingInDatabase(jobPosting);
+      }
+
+      if (!scraper.moreResults()) {
+        break;
       }
     }
   }

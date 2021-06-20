@@ -20,6 +20,7 @@ public class StackoverflowScraper extends Scraper {
 
   private int start = 1;
 
+  private boolean moreResults = true;
 
   public StackoverflowScraper(ScrapeJob scrapeJob) {
     super(scrapeJob);
@@ -75,6 +76,8 @@ public class StackoverflowScraper extends Scraper {
     // do we need to keep scraping
     if (hasMoreResults(document)) {
       this.start += 1;
+    } else {
+      this.moreResults = false;
     }
 
     return jobPostings;
@@ -169,5 +172,8 @@ public class StackoverflowScraper extends Scraper {
     }
   }
 
-
+  @Override
+  public boolean moreResults() {
+    return moreResults;
+  }
 }

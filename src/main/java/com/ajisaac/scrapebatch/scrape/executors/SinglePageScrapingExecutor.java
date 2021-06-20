@@ -4,10 +4,8 @@ import com.ajisaac.scrapebatch.dto.DatabaseService;
 import com.ajisaac.scrapebatch.dto.JobPosting;
 import com.ajisaac.scrapebatch.network.PageGrabber;
 import com.ajisaac.scrapebatch.network.WebsocketNotifier;
-import com.ajisaac.scrapebatch.scrape.CleanseDescription;
 import com.ajisaac.scrapebatch.scrape.scrapers.Scraper;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -93,14 +91,6 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
   @Override
   public synchronized void stopScraping() {
     this.stopped = true;
-  }
-
-  private void cleanseDescription(JobPosting jobPosting) {
-    String desc = jobPosting.getDescription();
-    if (desc != null) {
-      desc = CleanseDescription.cleanse(desc);
-      jobPosting.setDescription(desc);
-    }
   }
 
   private void pause(int maxSeconds) {

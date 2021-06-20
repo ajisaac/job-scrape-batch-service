@@ -148,26 +148,9 @@ public class RemoteokioScraper extends Scraper {
     throw new RuntimeException();
   }
 
-  public JobPosting setJobSite(JobPosting jobPosting) {
-    jobPosting.setJobSite(ScrapingExecutorType.REMOTEOKIO.toString());
-    return jobPosting;
-  }
-
-  public void setScrapeJob(ScrapeJob scrapeJob) {
-    // no need currently
-  }
 
   public URI getNextMainPageURI() {
-    var uriBuilder = new URIBuilder();
-    try {
-      // default values
-      uriBuilder.setScheme("https");
-      uriBuilder.setHost("remoteok.io");
-      uriBuilder.setPath("remote-dev-jobs");
-      return uriBuilder.build();
-    } catch (URISyntaxException e) {
-      return null;
-    }
+    return URI.create("https://remoteok.io/remote-dev-jobs");
   }
 
   @Override
@@ -175,7 +158,7 @@ public class RemoteokioScraper extends Scraper {
     String description = posting.getDescription();
     if (description != null) {
       String newDesc = "";
-      var split = description.split("\n");
+      var split = description.split("\\\\n");
       for (String s : split) {
         newDesc = newDesc.concat(s).concat("<br>");
       }
