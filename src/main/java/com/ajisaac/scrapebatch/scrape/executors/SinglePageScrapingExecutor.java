@@ -18,7 +18,7 @@ public class SinglePageScrapingExecutor implements ScrapingExecutor {
 
   private final Scraper scraper;
   private final String name;
-  //  @Inject
+
   DatabaseService databaseService;
   private WebsocketNotifier notifier;
 
